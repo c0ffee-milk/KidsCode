@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "codeforkids-front",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,6 +13,10 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "blockly": "^12.1.0",
+    "element-plus": "^2.10.3",
+    "monaco-editor": "^0.52.2",
     "pinia": "^3.0.3",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
