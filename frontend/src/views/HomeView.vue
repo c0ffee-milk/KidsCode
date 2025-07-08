@@ -4,8 +4,16 @@
       <h1>欢迎来到少儿编程世界</h1>
       <p class="subtitle">通过有趣的游戏学习编程基础</p>
       <div class="action-buttons">
-        <el-button type="primary" size="large" @click="navigateTo('/login')">开始学习</el-button>
-        <el-button size="large" @click="navigateTo('/register')">注册账号</el-button>
+        <el-button
+          type="primary"
+          size="large"
+          @click="userStore.token ? $router.push('/learn') : $router.push('/login')"
+        >
+          {{ userStore.token ? '继续学习' : '开始学习' }}
+        </el-button>
+        <el-button size="large" @click="userStore.token ? userStore.logout() : $router.push('/register')">
+          {{ userStore.token ? '退出登录' : '注册账号' }}
+        </el-button>
       </div>
     </div>
 
@@ -28,13 +36,13 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { MagicStick, Connection, DataBoard } from '@element-plus/icons-vue';
+import { MagicStick, Connection, DataBoard, Trophy } from '@element-plus/icons-vue';
+
+import { useUserStore } from '@/stores/user';
+const userStore = useUserStore();
 
 const router = useRouter();
 
-const navigateTo = (path: string) => {
-  router.push(path);
-};
 
 const features = [
   {
@@ -51,6 +59,11 @@ const features = [
     title: '进度追踪',
     description: '记录你的学习进度和成就',
     icon: DataBoard
+  },
+  {
+    title: '奖励机制',
+    description: '完成课程获得徽章和积分奖励',
+    icon: Trophy
   }
 ];
 </script>

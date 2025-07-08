@@ -4,7 +4,7 @@ import { login } from '../services/auth/login'
 import { register } from '../services/auth/register'
 
 export const useUserStore = defineStore('user', () => {
-  const token = ref('')
+  const token = ref('111')
   const username = ref('')
 
   const loginUser = async (name: string, password: string) => {
@@ -17,5 +17,10 @@ export const useUserStore = defineStore('user', () => {
     await register(username, password)
   }
 
-  return { token, username, login: loginUser, register: registerUser }
+  const logout = () => {
+    token.value = ''
+    username.value = ''
+  }
+
+  return { token, username, login: loginUser, register: registerUser, logout }
 })

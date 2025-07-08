@@ -1,16 +1,22 @@
 <template>
-  <el-menu mode="horizontal" router="true" default-active="/">
+  <el-menu mode="horizontal" :router="true" :default-active="$route.path">
     <el-menu-item index="/"
       ><el-icon><House /></el-icon>首页</el-menu-item
     >
-    <el-menu-item index="/login"
+    <el-menu-item index="/learn"
+      ><el-icon><Reading /></el-icon>学习</el-menu-item
+    >
+    <el-menu-item v-if="!userStore.token" index="/login"
       ><el-icon><User /></el-icon>登录</el-menu-item
     >
-    <el-menu-item index="/register"
+    <el-menu-item v-if="!userStore.token" index="/register"
       ><el-icon><EditPen /></el-icon>注册</el-menu-item
     >
-    <el-menu-item index="/mine"
+    <el-menu-item v-if="userStore.token" index="/mine"
       ><el-icon><Postcard /></el-icon>我的</el-menu-item
+    >
+    <el-menu-item v-if="userStore.token" @click="userStore.logout()" index="/logout"
+      ><el-icon><SwitchButton /></el-icon>退出登录</el-menu-item
     >
   </el-menu>
   <el-divider />
@@ -20,7 +26,10 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useUserStore } from './stores/user';
+const userStore = useUserStore();
+</script>
 
 <style>
 .el-menu {
