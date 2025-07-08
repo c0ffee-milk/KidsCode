@@ -7,9 +7,9 @@ import App from './App.vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import Blockly from 'blockly'
+import * as Blockly from 'blockly'
 import 'blockly/javascript'
-import hans from 'blockly/msg/zh-hans'
+import * as hans from 'blockly/msg/zh-hans'
 Blockly.setLocale(hans);
 
 const app = createApp(App)
