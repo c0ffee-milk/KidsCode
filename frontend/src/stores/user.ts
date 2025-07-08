@@ -1,33 +1,21 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { login } from '../services/auth/login'
+import { register } from '../services/auth/register'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref('')
   const username = ref('')
 
-  const login = async (username: string, password: string) => {
-    const response = await fetch('http://localhost:5000/api/login', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ username, password })
-    })
-
-    if (!response.ok) throw new Error('登录失败')
-
-    const data = await response.json()
+  const loginUser = async (name: string, password: string) => {
+    const data = await login(name, password)
     token.value = data.token
-    username.value = data.username
+    username.value = data.name
   }
 
-  const register = async (username: string, password: string) => {
-    const response = await fetch('http://localhost:5000/api/register', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ username, password })
-    })
-
-    if (!response.ok) throw new Error('注册失败')
+  const registerUser = async (username: string, password: string) => {
+    await register(username, password)
   }
 
-  return { token, username, login, register }
+  return { token, username, login: loginUser, register: registerUser }
 })
