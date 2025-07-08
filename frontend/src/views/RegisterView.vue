@@ -1,8 +1,6 @@
 <template>
   <div class="register-container">
     <el-card class="register-card">
-      <h2 class="register-title">用户注册</h2>
-
       <el-form
         :model="form"
         :rules="rules"
@@ -122,7 +120,6 @@ const goToLogin = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   background-color: #f5f7fa;
 }
 
