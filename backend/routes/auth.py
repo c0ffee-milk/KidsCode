@@ -99,14 +99,12 @@ def register():
         refresh_token = create_refresh_token(identity=user.id)
 
         return jsonify({
-            'access_token': access_token,
-            'refresh_token': refresh_token,
-            'user': {
-                'id': user.id,
-                'role': user.role.value,
-                'name': user.name,
-                'school_id': user.school_id,
-            }
+            'status': 'success',
+            'message': '注册成功',
+            'id': user.id,
+            'user_name': user.user_name,
+            'token': access_token,
+            'refresh_token': refresh_token
         })
     
     except Exception as e:
