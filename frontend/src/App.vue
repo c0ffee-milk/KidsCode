@@ -1,23 +1,22 @@
 <template>
-  <div class="side-decor left">
+  <!-- <div class="side-decor left"> -->
     <!-- 左侧装饰：可用SVG、PNG或emoji等 -->
     <!-- <img src="@/assets/decor_robot.svg" alt="机器人" class="decor-icon" />
     <img src="@/assets/decor_code.svg" alt="代码块" class="decor-icon" /> -->
     <!-- <div class="tip">开心coding！</div> -->
-  </div>
-  <div class="side-decor right">
+  <!-- </div>
+  <div class="side-decor right"> -->
     <!-- 右侧装饰 -->
     <!-- <img src="@/assets/decor_cat.svg" alt="猫咪" class="decor-icon" />
     <img src="@/assets/decor_rocket.svg" alt="火箭" class="decor-icon" /> -->
     <!-- <div class="tip">健康growing！</div> -->
-  </div>
+  <!-- </div> -->
 
   <header class="app-header">
     <div class="header-content">
       <div class="logo-section">
         <img src="/favicon.svg" class="app-logo" />
         <span class="app-title">CodeForKids</span>
-        <span class="app-subtitle">少儿编程平台</span>
       </div>
       <nav class="nav-section">
         <el-menu
@@ -25,6 +24,7 @@
           router="true"
           :default-active="$route.path"
           class="app-menu"
+          :collapse="isCollapse"
         >
           <el-menu-item index="/">
             <el-icon><House /></el-icon>首页
@@ -86,20 +86,17 @@
           <template #title>
         <el-icon><User /></el-icon>用户中心
           </template>
-          <el-menu-item index="/user/login">
-            <el-icon><Key /></el-icon>登录
-          </el-menu-item>
-          <el-menu-item index="/user/register">
-            <el-icon><UserFilled /></el-icon>注册
-          </el-menu-item>
           <el-menu-item index="/user/report">
-            <el-icon><User /></el-icon>用户报告
+            <el-icon><User /></el-icon>用户画像
           </el-menu-item>
           <el-menu-item index="/user/profile">
             <el-icon><User /></el-icon>个人资料
           </el-menu-item>
         </el-sub-menu>
 
+        <el-menu-item index="/login">
+            登录
+          </el-menu-item>
         </el-menu>
       </nav>
     </div>
@@ -126,7 +123,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 
+const isCollapse = ref(false) // 添加响应式变量并明确类型
 </script>
 
 <style>
@@ -205,18 +204,18 @@ body {
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  min-width: 200px; /* 增加logo区域宽度 */
+  min-width: 200px;
 }
 
 .app-logo {
-  width: 42px; /* 稍微增大logo */
+  width: 42px;
   height: 42px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
 .app-title {
-  font-size: 22px; /* 增大标题字体 */
+  font-size: 22px;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -224,17 +223,11 @@ body {
   background-clip: text;
 }
 
-.app-subtitle {
-  font-size: 13px; /* 稍微增大副标题 */
-  color: #64748b;
-  margin-left: 8px;
-}
-
 .nav-section {
   flex: 1;
   display: flex;
   justify-content: center;
-  max-width: 900px; /* 原来可能是1000px或更大，改小一点 */
+  max-width: 100%;
   margin: 0 10px;
 }
 
@@ -244,78 +237,8 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: flex-start; /* 改为左对齐或space-between都可以 */
-  gap: 12px; /* 原来gap可能太大，建议8px~16px之间 */
-}
-
-.app-menu .el-menu-item,
-.app-menu .el-sub-menu {
-  min-width: 70px; /* 原来可能95px或更大，适当减小 */
-  padding: 0 8px; /* 原来14px，适当减小 */
-  margin: 0 2px;
-  font-size: 15px;
-}
-
-.app-menu .el-sub-menu .el-sub-menu__title {
-  height: 44px;
-  line-height: 44px;
-  border-radius: 10px;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  min-width: 125px; /* 增加下拉菜单最小宽度 */
-  justify-content: center;
-}
-
-.app-menu .el-menu-item .el-icon,
-.app-menu .el-sub-menu .el-icon {
-  margin-right: 6px; /* 稍微减少图标间距 */
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.app-menu .el-menu-item:hover,
-.app-menu .el-sub-menu:hover .el-sub-menu__title {
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-}
-
-.app-menu .el-menu-item.is-active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-/* 下拉菜单样式 */
-.app-menu .el-sub-menu .el-menu {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  padding: 8px 0;
-  margin-top: 8px;
-  min-width: 180px;
-}
-
-.app-menu .el-sub-menu .el-menu .el-menu-item {
-  height: 38px;
-  line-height: 38px;
-  margin: 2px 8px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 0 12px;
-  min-width: auto;
-}
-
-.app-menu .el-sub-menu .el-menu .el-menu-item:hover {
-  background: rgba(102, 126, 234, 0.08);
-  color: #667eea;
-  transform: none;
-  box-shadow: none;
+  justify-content: flex-start;
+  gap: 10px;
 }
 
 /* 主内容区 - 全宽度，不限制宽度 */
@@ -468,3 +391,5 @@ body {
   }
 }
 </style>
+
+

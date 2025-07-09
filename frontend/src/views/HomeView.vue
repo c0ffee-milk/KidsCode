@@ -279,10 +279,13 @@ const stats = [
 
 /* Stats 区域 - 全宽度彩色背景 */
 .stats-section {
-  width: 100%;
+  width: 95%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 60px 0;
+  border-radius: 20px;
+  margin: 0 auto;
 }
+
 
 .stats-container {
   max-width: 1400px;
