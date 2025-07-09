@@ -54,6 +54,8 @@ def create_app():
     CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ORIGINS']}})
 
     # 注册蓝图
+    # 创建蓝图并设置前缀
+    api_bp = Blueprint('api', __name__, url_prefix='/api/v1')
 
 
     # 错误处理
