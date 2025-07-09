@@ -7,11 +7,11 @@
           <h1 class="hero-title">欢迎来到少儿编程世界</h1>
           <p class="hero-subtitle">通过有趣的游戏学习编程基础</p>
           <div class="action-buttons">
-            <el-button type="primary" size="large" @click="navigateTo('/learn')">
+            <el-button type="primary" size="large" @click="router.push('/learn')">
               <el-icon><Edit /></el-icon>
               开始学习
             </el-button>
-            <el-button size="large" @click="navigateTo('/register')">
+            <el-button size="large" @click="router.push('/register')">
               <el-icon><UserFilled /></el-icon>
               注册账号
             </el-button>

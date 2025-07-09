@@ -68,38 +68,64 @@
 </template>
 
 <script setup lang="ts">
+// 导入Vue相关依赖
 import { ref } from 'vue'
+// 导入路由相关
 import { useRouter } from 'vue-router'
+// 导入Element Plus组件
 import { ElMessage } from 'element-plus'
+// 导入Element Plus图标
 import { Star, Trophy } from '@element-plus/icons-vue'
+// 导入用户状态管理
 import { useUserStore } from '@/stores/user'
 
+// 定义表单数据
 const form = ref({
-  username: '',
-  password: ''
+  username: '', // 用户名
+  password: ''  // 密码
 })
 
+// 表单验证规则
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
+// 获取路由实例
 const router = useRouter()
+// 获取用户状态管理实例
 const userStore = useUserStore()
+// 加载状态
 const loading = ref(false)
+// 表单引用
 const loginForm = ref()
 
+/**
+ * 处理登录逻辑
+ * @returns {Promise} 返回用户信息Promise
+ */
 const handleLogin = async () => {
   if (!loginForm.value) return
   try {
+    // 验证表单
     const valid = await loginForm.value.validate()
     if (!valid) return
+
+    // 设置加载状态
     loading.value = true
+
+    // 调用登录接口
     const user = await userStore.login(form.value.username, form.value.password)
+
+    // 登录成功提示
     ElMessage.success('登录成功！欢迎回来！')
+
+    // 跳转到首页
     router.push('/')
+
     return user
   } catch (error) {
+    // 错误处理
     if (error instanceof Error) {
       ElMessage.error(error.message)
     } else {
@@ -107,6 +133,7 @@ const handleLogin = async () => {
     }
     throw error
   } finally {
+    // 重置加载状态
     loading.value = false
   }
 }

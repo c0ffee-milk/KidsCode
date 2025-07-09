@@ -161,7 +161,8 @@ const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
 const isSending = ref(false)
-const countdown = ref(60)
+const initialCountdown = 60
+const countdown = ref(initialCountdown)
 const registerForm = ref()
 
 const sendCode = async () => {
@@ -180,7 +181,7 @@ const sendCode = async () => {
       if (countdown.value <= 0) {
         clearInterval(timer)
         isSending.value = false
-        countdown.value = 60
+        countdown.value = initialCountdown
       }
     }, 1000)
   } catch (error) {
