@@ -100,10 +100,8 @@ const loading = ref(false)
 // 表单引用
 const loginForm = ref()
 
-/**
- * 处理登录逻辑
- * @returns {Promise} 返回用户信息Promise
- */
+// 处理登录逻辑
+
 const handleLogin = async () => {
   if (!loginForm.value) return
   try {

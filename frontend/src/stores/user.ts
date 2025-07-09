@@ -7,7 +7,7 @@ import { sendCode } from '../services/auth/register'
 export const useUserStore = defineStore('user', () => {
   const token = ref('')
   const refreshToken = ref('')
-  const username = ref('')
+  const user_name = ref('')
   const userId = ref('')
 
   const loginUser = async (username: string, password: string) => {
@@ -15,7 +15,7 @@ export const useUserStore = defineStore('user', () => {
     token.value = data.token
     refreshToken.value = data.refresh_token
     // 这里的 username 变量名与参数名冲突，导致报错，修改为使用 ref 定义的 username
-    username.value = data.user_name
+    user_name.value = data.user_name
     userId.value = data.id
   }
 
@@ -23,7 +23,7 @@ export const useUserStore = defineStore('user', () => {
     const data = await register(username, phone, password, code)
     token.value = data.token
     refreshToken.value = data.refresh_token
-    username.value = data.user_name
+    user_name.value = data.user_name
     userId.value = data.id
   }
 
@@ -34,14 +34,14 @@ export const useUserStore = defineStore('user', () => {
   const logout = () => {
     token.value = ''
     refreshToken.value = ''
-    username.value = ''
+    user_name.value = ''
     userId.value = ''
   }
 
   return {
     token,
     refreshToken,
-    username,
+    username:user_name,
     userId,
     login: loginUser,
     register: registerUser,
