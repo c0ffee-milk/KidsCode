@@ -18,7 +18,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
+  max-width: 1400px;
+  margin: 0 auto;
   background-color: #f5f7fa;
 }
 

@@ -1,30 +1,57 @@
 <template>
-  <div class="mine-container">
-    <el-card class="user-card">
-      <div class="user-info">
-        <el-avatar :size="100" :src="userAvatar" />
-        <div class="user-details">
-          <h2>{{ username }}</h2>
-          <p>编程小能手</p>
-        </div>
+  <div class="mine-page">
+    <div class="mine-container">
+      <div class="page-header">
+        <h1 class="page-title">我的学习中心</h1>
+        <p class="page-desc">查看学习进度和个人成就</p>
       </div>
-    </el-card>
 
-    <el-card class="progress-card">
-      <h3>我的学习进度</h3>
-      <el-progress :percentage="progress" :stroke-width="20" />
-      <div class="badges">
-        <h4>获得的徽章</h4>
-        <div class="badge-list">
-          <el-tag v-for="badge in badges" :key="badge" type="success">{{ badge }}</el-tag>
-        </div>
+      <div class="mine-content">
+        <el-card class="user-card">
+          <div class="user-info">
+            <el-avatar :size="100" :src="userAvatar" />
+            <div class="user-details">
+              <h2>{{ username }}</h2>
+              <p>编程小能手</p>
+            </div>
+          </div>
+        </el-card>
+
+        <el-card class="progress-card">
+          <template #header>
+            <div class="card-header">
+              <el-icon><DataBoard /></el-icon>
+              <span>我的学习进度</span>
+            </div>
+          </template>
+          <div class="progress-content">
+            <el-progress :percentage="progress" :stroke-width="20" />
+            <p class="progress-text">已完成 {{ progress }}% 的课程</p>
+          </div>
+        </el-card>
+
+        <el-card class="badges-card">
+          <template #header>
+            <div class="card-header">
+              <el-icon><Medal /></el-icon>
+              <span>获得的徽章</span>
+            </div>
+          </template>
+          <div class="badge-list">
+            <div v-for="badge in badges" :key="badge" class="badge-item">
+              <el-icon><Trophy /></el-icon>
+              <span>{{ badge }}</span>
+            </div>
+          </div>
+        </el-card>
       </div>
-    </el-card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { DataBoard, Medal, Trophy } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/user';
 
 const userStore = useUserStore();
@@ -36,7 +63,7 @@ const badges = ref(['入门小天才', '逻辑小达人', '创意小能手']);
 
 <style scoped>
 .mine-container {
-  max-width: 800px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
 }
