@@ -15,7 +15,7 @@
   <header class="app-header">
     <div class="header-content">
       <div class="logo-section">
-        <img src="/favicon.ico" class="app-logo" />
+        <img src="/favicon.svg" class="app-logo" />
         <span class="app-title">CodeForKids</span>
         <span class="app-subtitle">少儿编程平台</span>
       </div>
@@ -29,7 +29,7 @@
           <el-menu-item index="/">
             <el-icon><House /></el-icon>首页
           </el-menu-item>
-          
+
           <!-- 课程学习 -->
           <el-sub-menu index="learn">
             <template #title>
@@ -403,7 +403,7 @@ body {
     max-width: 100%;
     padding: 0 24px;
   }
-  
+
   .nav-section {
     max-width: 800px;
     margin: 0 20px;
@@ -414,12 +414,12 @@ body {
   .header-content {
     padding: 0 16px;
   }
-  
+
   .nav-section {
     max-width: 700px;
     margin: 0 16px;
   }
-  
+
   .app-menu .el-menu-item,
   .app-menu .el-sub-menu {
     margin: 0 2px;
@@ -427,7 +427,7 @@ body {
     font-size: 14px;
     min-width: 80px;
   }
-  
+
   .app-menu .el-sub-menu .el-sub-menu__title {
     padding: 0 10px;
     min-width: 100px;
@@ -454,13 +454,13 @@ body {
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .app-menu .el-menu-item,
   .app-menu .el-sub-menu {
     margin: 4px;
     min-width: auto;
   }
-  
+
   .logo-section {
     min-width: auto;
   }
