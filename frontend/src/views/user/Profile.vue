@@ -98,7 +98,7 @@
               <template #header>
                 <div class="card-header">
                   <span>个人信息</span>
-                  <el-button type="primary" @click="editMode = !editMode">
+                  <el-button type="primary" @click="handleEdit">
                     {{ editMode ? '保存' : '编辑' }}
                   </el-button>
                 </div>
@@ -516,16 +516,18 @@ const beforeAvatarUpload = (file: File) => {
   return true
 }
 
+// 优化头像上传，支持预览
 const uploadAvatar = async (options: any) => {
-  // TODO: 实现头像上传 API 调用
   try {
-    const formData = new FormData()
-    formData.append('avatar', options.file)
+    const file = options.file
+    const reader = new FileReader()
     
-    // const response = await api.uploadAvatar(formData)
-    // userInfo.value.avatar = response.data.avatarUrl
+    reader.onload = (e) => {
+      userInfo.value.avatar = e.target?.result as string
+      ElMessage.success('头像更新成功!')
+    }
     
-    ElMessage.success('头像上传成功!')
+    reader.readAsDataURL(file)
   } catch (error) {
     ElMessage.error('头像上传失败!')
   }
@@ -593,11 +595,47 @@ const openProject = (project: any) => {
   ElMessage.info(`打开项目: ${project.name}`)
 }
 
+// 保存用户资料
+const saveProfile = async () => {
+  try {
+    // 这里可以先存到 localStorage 或者 sessionStorage
+    localStorage.setItem('userProfile', JSON.stringify(userInfo.value))
+    ElMessage.success('资料保存成功!')
+    editMode.value = false
+  } catch (error) {
+    ElMessage.error('保存失败，请重试!')
+  }
+}
+
+// 编辑按钮点击事件
+const handleEdit = () => {
+  if (editMode.value) {
+    saveProfile()
+  } else {
+    editMode.value = true
+  }
+}
+
 // 生命周期
 onMounted(async () => {
   // TODO: 加载用户数据
   await loadUserProfile()
+  
+  // 在 onMounted 中加载本地数据
+  loadLocalProfile()
 })
+
+const loadLocalProfile = () => {
+  const savedProfile = localStorage.getItem('userProfile')
+  if (savedProfile) {
+    try {
+      userInfo.value = { ...userInfo.value, ...JSON.parse(savedProfile) }
+      ElMessage.success('欢迎回来！')
+    } catch (error) {
+      console.error('加载本地数据失败:', error)
+    }
+  }
+}
 
 const loadUserProfile = async () => {
   try {
@@ -1081,6 +1119,24 @@ const api = {
   
   .badges-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 0 16px;
+  }
+  
+  .profile-header {
+    padding: 16px 0;
+  }
+  
+  .username {
+    font-size: 1.5rem;
+  }
+  
+  .user-stats {
+    gap: 20px;
   }
 }
 </style>
