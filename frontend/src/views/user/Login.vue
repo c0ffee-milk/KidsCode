@@ -95,15 +95,17 @@ const handleLogin = async () => {
     const valid = await loginForm.value.validate()
     if (!valid) return
     loading.value = true
-    await userStore.login(form.value.username, form.value.password)
+    const user = await userStore.login(form.value.username, form.value.password)
     ElMessage.success('登录成功！欢迎回来！')
     router.push('/')
+    return user
   } catch (error) {
     if (error instanceof Error) {
       ElMessage.error(error.message)
     } else {
       ElMessage.error('登录失败，请稍后重试')
     }
+    throw error
   } finally {
     loading.value = false
   }
@@ -249,6 +251,7 @@ const handleLogin = async () => {
   color: white;
   position: relative;
   overflow: hidden;
+  border-radius: 24px;
 }
 
 .login-illustration::before {

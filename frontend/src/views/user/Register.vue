@@ -17,6 +17,15 @@
                 class="register-input"
               ></el-input>
             </el-form-item>
+            <el-form-item prop="phone">
+              <el-input
+                v-model="form.phone"
+                placeholder="手机号"
+                prefix-icon="Iphone"
+                size="large"
+                class="register-input"
+              ></el-input>
+            </el-form-item>
             <el-form-item prop="password">
               <el-input
                 v-model="form.password"
@@ -38,6 +47,26 @@
                 size="large"
                 class="register-input"
               ></el-input>
+            </el-form-item>
+            <el-form-item prop="code">
+              <div class="code-input-container">
+                <el-input
+                  v-model="form.code"
+                  placeholder="验证码"
+                  prefix-icon="Message"
+                  size="large"
+                  class="register-input code-input"
+                ></el-input>
+                <el-button
+                  type="primary"
+                  size="large"
+                  class="send-code-btn register-input "
+                  @click="sendCode"
+                  :disabled="isSending"
+                >
+                  {{ isSending ? `${countdown}秒后重试` : '获取验证码' }}
+                </el-button>
+              </div>
             </el-form-item>
             <el-form-item>
               <el-button
@@ -85,13 +114,15 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Star, Medal, Connection } from '@element-plus/icons-vue'
+import { Star, Medal, Connection, Iphone, Message } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
 const form = ref({
   username: '',
+  phone: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
+  code: ''
 })
 
 const validatePass = (rule: any, value: string, callback: Function) => {
@@ -109,6 +140,10 @@ const rules = {
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur' }
   ],
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+  ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
@@ -116,13 +151,47 @@ const rules = {
   confirmPassword: [
     { required: true, message: '请再次输入密码', trigger: 'blur' },
     { validator: validatePass, trigger: 'blur' }
+  ],
+  code: [
+    { required: true, message: '请输入验证码', trigger: 'blur' }
   ]
 }
 
 const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
+const isSending = ref(false)
+const countdown = ref(60)
 const registerForm = ref()
+
+const sendCode = async () => {
+  if (!form.value.phone) {
+    ElMessage.error('请输入手机号')
+    return
+  }
+
+  try {
+    isSending.value = true
+    await userStore.sendCode(form.value.phone)
+    ElMessage.success('验证码已发送')
+
+    const timer = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0) {
+        clearInterval(timer)
+        isSending.value = false
+        countdown.value = 60
+      }
+    }, 1000)
+  } catch (error) {
+    isSending.value = false
+    if (error instanceof Error) {
+      ElMessage.error(error.message)
+    } else {
+      ElMessage.error('发送验证码失败')
+    }
+  }
+}
 
 const handleRegister = async () => {
   if (!registerForm.value) return
@@ -130,7 +199,7 @@ const handleRegister = async () => {
     const valid = await registerForm.value.validate()
     if (!valid) return
     loading.value = true
-    await userStore.register(form.value.username, form.value.password)
+    await userStore.register(form.value.username, form.value.phone, form.value.password, form.value.code)
     ElMessage.success('注册成功！欢迎加入CodeForKids！')
     router.push('/user/login')
   } catch (error) {
@@ -251,6 +320,27 @@ const handleRegister = async () => {
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
+.code-input-container {
+  display: flex;
+  gap: 12px;
+}
+
+.code-input {
+  flex: 1;
+}
+
+.send-code-btn {
+  width: 140px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #38b2ac 0%, #4fd1c7 100%);
+  border: none;
+}
+
+.send-code-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(56, 178, 172, 0.3);
+}
+
 .register-footer {
   text-align: center;
   margin-top: 32px;
@@ -284,6 +374,7 @@ const handleRegister = async () => {
   color: white;
   position: relative;
   overflow: hidden;
+  border-radius: 24px;
 }
 
 .register-illustration::before {

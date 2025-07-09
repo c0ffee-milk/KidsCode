@@ -5,6 +5,9 @@ export const login = async (username: string, password: string) => {
     body: JSON.stringify({ username, password })
   });
 
-  if (!response.ok) throw new Error('登录失败');
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || '登录失败')
+  }
   return await response.json();
 };

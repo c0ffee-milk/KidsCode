@@ -66,7 +66,7 @@
         <div class="cta-content">
           <h2>准备好开始你的编程之旅了吗？</h2>
           <p>加入我们，让孩子在快乐中学习编程！</p>
-          <el-button type="primary" size="large" @click="navigateTo('/learn')">
+          <el-button type="primary" size="large" @click="router.push('/learn')">
             立即开始
           </el-button>
         </div>
