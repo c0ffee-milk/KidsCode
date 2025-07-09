@@ -38,7 +38,7 @@ def create_app():
     if not os.path.exists('logs'):
         os.mkdir('logs')
     file_handler = RotatingFileHandler(
-        'logs/app.log'
+        'logs/app.log',
         maxBytes=10240, 
         backupCount=10
     )
