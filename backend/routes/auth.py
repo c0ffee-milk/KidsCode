@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db, jwt, redis_client
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
-from model import User, RoleEnum
+from model import User, VerificationCode
 import requests
 from config import Config
 from sqlalchemy.exc import SQLAlchemyError
@@ -13,6 +13,7 @@ from Cryptodome.Cipher import AES
 from utils.csv_utils import verify_user_identity
 from datetime import timedelta
 from utils.sms_service import generate_code, send_sms, save_verification_code, verify_code
+from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -43,7 +44,7 @@ def login():
             return jsonify({'error': '缺少必要参数'}), 400
         
         user = User.query.filter_by(user_name=name).first()
-        if not user or not user.check_password(password):
+        if not user or not user.check_password_hash(user.password_hash, password):
             return jsonify({'error': '用户名或密码错误'}), 401
         
         access_token = create_access_token(identity=user.id)
@@ -100,13 +101,20 @@ def register():
         existing_user = User.query.filter_by(phone=phone).first()
         if existing_user:
             return jsonify({'error': '该手机号已被注册'}), 400
-
+        
+        # 检查用户名是否已被注册
+        existing_user = User.query.filter_by(name=name).first()
+        if existing_user:
+            return jsonify({'error': '该用户名已被注册'}), 400
 
         user = User(
             name=name,
             phone=phone,
-            password=password
+            password_hash=generate_password_hash(password)
         )
+        # 使用后删除验证码
+        code = VerificationCode.query.filter_by(phone=phone).first()
+        db.session.delete(code)
         db.session.add(user)
         db.session.commit()
 

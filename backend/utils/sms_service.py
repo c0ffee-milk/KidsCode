@@ -1,7 +1,8 @@
 import random
 import string
 from datetime import datetime, timedelta
-# from your_app import VerificationCode, db
+from extensions import db
+from model import VerificationCode
 import requests
 import ssl
 
@@ -35,13 +36,11 @@ def send_sms(phone, code):
         return False
 
 def save_verification_code(phone, code):
-    expiration = datetime.now() + timedelta(minutes=5)
     existing = VerificationCode.query.filter_by(phone=phone).first()
     if existing:
         existing.code = code
-        existing.expires_at = expiration
     else:
-        new_code = VerificationCode(phone=phone, code=code, expires_at=expiration)
+        new_code = VerificationCode(phone=phone, code=code, created_at=datetime.now())
         db.session.add(new_code)
     db.session.commit()
 
@@ -49,7 +48,7 @@ def verify_code(phone, input_code):
     record = VerificationCode.query.filter_by(phone=phone).first()
     if not record:
         return False
-    if record.expires_at < datetime.now():
+    if record.created_at < datetime.now() - timedelta(minutes=3):
         return False
     if record.code == input_code:
         return True

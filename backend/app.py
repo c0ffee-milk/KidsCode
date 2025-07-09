@@ -1,12 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import config
-from extensions import db, jwt, redis_client, init_extensions
+from extensions import db, jwt
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-from routes.reservation import init_routes_and_schedules
 
 
 def init_app(app):
@@ -14,13 +13,6 @@ def init_app(app):
         try:
             # 创建数据库表
             db.create_all()
-            
-            # 初始化路线和班次数据
-            init_routes_and_schedules()
-            
-            # 初始化定时任务
-            from tasks import init_scheduler
-            init_scheduler(app)
             
         except Exception as e:
             app.logger.error(f"初始化应用失败: {str(e)}")
@@ -55,7 +47,9 @@ def create_app():
 
     # 注册蓝图
     # 创建蓝图并设置前缀
-    api_bp = Blueprint('api', __name__, url_prefix='/api/v1')
+    from routes.auth import auth_bp
+
+    app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
 
 
     # 错误处理
