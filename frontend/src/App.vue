@@ -24,7 +24,6 @@
           router="true"
           :default-active="$route.path"
           class="app-menu"
-          :collapse="isCollapse"
         >
           <el-menu-item index="/">
             <el-icon><House /></el-icon>首页
@@ -125,7 +124,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const isCollapse = ref(false) // 添加响应式变量并明确类型
 </script>
 
 <style>
