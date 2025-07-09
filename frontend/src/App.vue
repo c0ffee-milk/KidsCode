@@ -93,7 +93,10 @@
             <el-icon><UserFilled /></el-icon>注册
           </el-menu-item>
           <el-menu-item index="/user/report">
-            <el-icon><User /></el-icon>个人中心
+            <el-icon><User /></el-icon>用户报告
+          </el-menu-item>
+          <el-menu-item index="/user/profile">
+            <el-icon><User /></el-icon>个人资料
           </el-menu-item>
         </el-sub-menu>
 
