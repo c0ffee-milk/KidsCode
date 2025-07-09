@@ -16,7 +16,7 @@ git clone --branch dev git@github.com:c0ffee-milk/KidsCode.git
 git pull
 ```
 
-2. coding结束后提交代码，同步到远程仓库
+2. coding结束后提交代码，同步到远程仓库（建议开发完一个模块或功能就同步一次代码，不要积攒太多代码一次性同步）
 
 ```shell
 git add .
