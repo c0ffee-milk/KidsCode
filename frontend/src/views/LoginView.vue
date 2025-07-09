@@ -139,7 +139,7 @@ const handleLogin = async () => {
 }
 
 .login-container {
-  max-width: 1000px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
   display: grid;

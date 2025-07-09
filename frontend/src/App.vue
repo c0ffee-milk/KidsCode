@@ -16,18 +16,81 @@
           <el-menu-item index="/">
             <el-icon><House /></el-icon>首页
           </el-menu-item>
-          <el-menu-item index="/learn">
-            <el-icon><Edit /></el-icon>开始学习
+          
+          <!-- 课程学习 -->
+          <el-sub-menu index="learn">
+            <template #title>
+              <el-icon><Edit /></el-icon>课程学习
+            </template>
+            <el-menu-item index="/learn/scratch">
+              <el-icon><Compass /></el-icon>Scratch编程
+            </el-menu-item>
+            <el-menu-item index="/learn/python">
+              <el-icon><Document /></el-icon>Python基础
+            </el-menu-item>
+            <el-menu-item index="/learn/web">
+              <el-icon><Monitor /></el-icon>网页制作
+            </el-menu-item>
+            <el-menu-item index="/learn/game">
+              <el-icon><Trophy /></el-icon>游戏开发
+            </el-menu-item>
+          </el-sub-menu>
+
+          <!-- 练习中心 -->
+          <el-sub-menu index="practice">
+            <template #title>
+              <el-icon><Cpu /></el-icon>练习中心
+            </template>
+            <el-menu-item index="/practice/coding">
+              <el-icon><EditPen /></el-icon>编程练习
+            </el-menu-item>
+            <el-menu-item index="/practice/challenge">
+              <el-icon><Star /></el-icon>编程挑战
+            </el-menu-item>
+            <el-menu-item index="/practice/project">
+              <el-icon><FolderOpened /></el-icon>项目实战
+            </el-menu-item>
+          </el-sub-menu>
+
+          <!-- 创作空间 -->
+          <el-menu-item index="/create">
+            <el-icon><Brush /></el-icon>创作空间
           </el-menu-item>
-          <el-menu-item index="/login">
-            <el-icon><User /></el-icon>登录
+
+          <!-- 社区 -->
+          <el-sub-menu index="community">
+            <template #title>
+              <el-icon><ChatDotSquare /></el-icon>社区
+            </template>
+            <el-menu-item index="/community/share">
+              <el-icon><Share /></el-icon>作品分享
+            </el-menu-item>
+            <el-menu-item index="/community/forum">
+              <el-icon><Message /></el-icon>讨论论坛
+            </el-menu-item>
+            <el-menu-item index="/community/competition">
+              <el-icon><Medal /></el-icon>编程竞赛
+            </el-menu-item>
+          </el-sub-menu>
+
+          <!-- 学习报告 -->
+          <el-menu-item index="/report">
+            <el-icon><DataAnalysis /></el-icon>学习报告
           </el-menu-item>
-          <el-menu-item index="/register">
-            <el-icon><EditPen /></el-icon>注册
-          </el-menu-item>
-          <el-menu-item index="/mine">
-            <el-icon><Postcard /></el-icon>我的
-          </el-menu-item>
+
+         <!-- 用户中心 - 一级菜单（下拉包含登录注册） -->
+        <el-sub-menu index="user">
+          <template #title>
+        <el-icon><User /></el-icon>用户中心
+          </template>
+        <el-menu-item index="/user/login">
+          <el-icon><Key /></el-icon>登录
+        </el-menu-item>
+        <el-menu-item index="/user/register">
+          <el-icon><UserFilled /></el-icon>注册
+        </el-menu-item>
+        </el-sub-menu>
+
         </el-menu>
       </nav>
     </div>
@@ -44,6 +107,8 @@
         <a href="#">关于我们</a>
         <a href="#">联系方式</a>
         <a href="#">帮助中心</a>
+        <a href="#">隐私政策</a>
+        <a href="#">用户协议</a>
       </div>
     </div>
   </footer>
@@ -96,30 +161,33 @@ body {
 }
 
 .header-content {
-  max-width: 1200px;
+  max-width: 1600px; /* 扩大容器宽度 */
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-  height: 72px;
+  padding: 0 32px; /* 增加左右padding */
+  height: 80px; /* 增加高度 */
+  min-width: 1400px;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+  min-width: 200px; /* 增加logo区域宽度 */
 }
 
 .app-logo {
-  width: 40px;
-  height: 40px;
+  width: 42px; /* 稍微增大logo */
+  height: 42px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
 .app-title {
-  font-size: 20px;
+  font-size: 22px; /* 增大标题字体 */
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -128,7 +196,7 @@ body {
 }
 
 .app-subtitle {
-  font-size: 12px;
+  font-size: 13px; /* 稍微增大副标题 */
   color: #64748b;
   margin-left: 8px;
 }
@@ -136,32 +204,103 @@ body {
 .nav-section {
   flex: 1;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  max-width: 1100px; /* 扩大导航区域 */
+  margin: 0 24px; /* 增加左右margin */
 }
 
 .app-menu {
   background: transparent;
   border-bottom: none;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-evenly; /* 改为均匀分布 */
+  gap: 4px; /* 添加间隙 */
+}
+
+.app-menu .el-menu-item,
+.app-menu .el-sub-menu {
+  height: 44px; /* 增加高度 */
+  line-height: 44px;
+  margin: 0 3px; /* 减少margin，通过gap控制间距 */
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #475569;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 15px; /* 稍微增大字体 */
 }
 
 .app-menu .el-menu-item {
-  height: 40px;
-  line-height: 40px;
-  margin: 0 4px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px; /* 调整padding */
+  min-width: 95px; /* 增加最小宽度 */
 }
 
-.app-menu .el-menu-item:hover {
+.app-menu .el-sub-menu .el-sub-menu__title {
+  height: 44px;
+  line-height: 44px;
+  border-radius: 10px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  min-width: 125px; /* 增加下拉菜单最小宽度 */
+  justify-content: center;
+}
+
+.app-menu .el-menu-item .el-icon,
+.app-menu .el-sub-menu .el-icon {
+  margin-right: 6px; /* 稍微减少图标间距 */
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.app-menu .el-menu-item:hover,
+.app-menu .el-sub-menu:hover .el-sub-menu__title {
   background: rgba(102, 126, 234, 0.1);
   color: #667eea;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
 .app-menu .el-menu-item.is-active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* 下拉菜单样式 */
+.app-menu .el-sub-menu .el-menu {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  padding: 8px 0;
+  margin-top: 8px;
+  min-width: 180px;
+}
+
+.app-menu .el-sub-menu .el-menu .el-menu-item {
+  height: 38px;
+  line-height: 38px;
+  margin: 2px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0 12px;
+  min-width: auto;
+}
+
+.app-menu .el-sub-menu .el-menu .el-menu-item:hover {
+  background: rgba(102, 126, 234, 0.08);
+  color: #667eea;
+  transform: none;
+  box-shadow: none;
 }
 
 /* 主内容区 - 全宽度，不限制宽度 */
@@ -169,7 +308,7 @@ body {
   flex: 1;
   width: 100%;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  min-height: calc(100vh - 144px);
+  min-height: calc(100vh - 160px); /* 调整最小高度适应新的header高度 */
 }
 
 .app-footer {
@@ -180,9 +319,9 @@ body {
 }
 
 .footer-content {
-  max-width: 1200px;
+  max-width: 1600px; /* 与header保持一致 */
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 32px; /* 与header padding保持一致 */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -209,6 +348,43 @@ body {
   color: #667eea;
 }
 
+/* 响应式布局 */
+@media (max-width: 1400px) {
+  .header-content {
+    max-width: 100%;
+    padding: 0 24px;
+  }
+  
+  .nav-section {
+    max-width: 800px;
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .header-content {
+    padding: 0 16px;
+  }
+  
+  .nav-section {
+    max-width: 700px;
+    margin: 0 16px;
+  }
+  
+  .app-menu .el-menu-item,
+  .app-menu .el-sub-menu {
+    margin: 0 2px;
+    padding: 0 10px;
+    font-size: 14px;
+    min-width: 80px;
+  }
+  
+  .app-menu .el-sub-menu .el-sub-menu__title {
+    padding: 0 10px;
+    min-width: 100px;
+  }
+}
+
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
@@ -217,25 +393,27 @@ body {
     gap: 16px;
   }
 
+  .nav-section {
+    max-width: 100%;
+    margin: 0;
+  }
+
   .app-menu {
     width: 100%;
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
   }
-
-  .footer-content {
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
-    padding: 20px 16px;
+  
+  .app-menu .el-menu-item,
+  .app-menu .el-sub-menu {
+    margin: 4px;
+    min-width: auto;
   }
-
-  .app-subtitle {
-    display: none;
-  }
-
-  .app-main {
-    min-height: calc(100vh - 180px);
+  
+  .logo-section {
+    min-width: auto;
   }
 }
 </style>
