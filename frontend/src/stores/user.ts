@@ -14,7 +14,6 @@ export const useUserStore = defineStore('user', () => {
     const data = await login(username, password)
     token.value = data.token
     refreshToken.value = data.refresh_token
-    // 这里的 username 变量名与参数名冲突，导致报错，修改为使用 ref 定义的 username
     user_name.value = data.user_name
     userId.value = data.id
   }
@@ -41,11 +40,15 @@ export const useUserStore = defineStore('user', () => {
   return {
     token,
     refreshToken,
-    username:user_name,
+    username: user_name,
     userId,
     login: loginUser,
     register: registerUser,
     sendCode: sendVerificationCode,
     logout
   }
-})
+}, {
+  persist: {
+    enabled: true,
+  }
+} as any)
