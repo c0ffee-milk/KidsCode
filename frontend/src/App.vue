@@ -1,14 +1,14 @@
 <template>
   <div class="side-decor left">
     <!-- 左侧装饰：可用SVG、PNG或emoji等 -->
-    <img src="@/assets/decor_robot.png" alt="机器人" class="decor-icon" />
-    <img src="@/assets/decor_code.png" alt="代码块" class="decor-icon" />
+    <img src="@/assets/decor_robot.svg" alt="机器人" class="decor-icon" />
+    <img src="@/assets/decor_code.svg" alt="代码块" class="decor-icon" />
     <div class="tip">开心coding！</div>
   </div>
   <div class="side-decor right">
     <!-- 右侧装饰 -->
-    <img src="@/assets/decor_cat.png" alt="猫咪" class="decor-icon" />
-    <img src="@/assets/decor_rocket.png" alt="火箭" class="decor-icon" />
+    <img src="@/assets/decor_cat.svg" alt="猫咪" class="decor-icon" />
+    <img src="@/assets/decor_rocket.svg" alt="火箭" class="decor-icon" />
     <div class="tip">健康growing！</div>
   </div>
 
