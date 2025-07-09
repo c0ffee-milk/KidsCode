@@ -140,11 +140,32 @@ html, body {
   overflow-x: hidden;
 }
 
+/* 增加少儿编程风格的动态渐变背景色 */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f8fafc;
+  background: linear-gradient(120deg, #f9e7fe, #e0f7fa, #fffde7, #ffe0e7, #e7ffe0, #e0e7ff);
+  background-size: 1200% 1200%;
+  animation: kids-gradient-move 18s ease-in-out infinite;
   color: #1a202c;
   line-height: 1.6;
+}
+
+@keyframes kids-gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 100%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 0%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 #app {
@@ -359,7 +380,7 @@ body {
   gap: 48px; /* 合理的间距 */
 }
 .decor-icon {
-  width: 240px;   /* 放大图片 */
+  width: 225px;   /* 放大图片 */
   height: 240px;
   margin: 16px 0; /* 上下间距适当 */
   opacity: 0.88;
