@@ -1,8 +1,21 @@
 <template>
+  <div class="side-decor left">
+    <!-- 左侧装饰：可用SVG、PNG或emoji等 -->
+    <img src="@/assets/decor_robot.png" alt="机器人" class="decor-icon" />
+    <img src="@/assets/decor_code.png" alt="代码块" class="decor-icon" />
+    <div class="tip">开心coding！</div>
+  </div>
+  <div class="side-decor right">
+    <!-- 右侧装饰 -->
+    <img src="@/assets/decor_cat.png" alt="猫咪" class="decor-icon" />
+    <img src="@/assets/decor_rocket.png" alt="火箭" class="decor-icon" />
+    <div class="tip">健康growing！</div>
+  </div>
+
   <header class="app-header">
     <div class="header-content">
       <div class="logo-section">
-        <img src="/favicon.ico" class="app-logo" />
+        <img src="/favicon.svg" class="app-logo" />
         <span class="app-title">CodeForKids</span>
         <span class="app-subtitle">少儿编程平台</span>
       </div>
@@ -16,7 +29,7 @@
           <el-menu-item index="/">
             <el-icon><House /></el-icon>首页
           </el-menu-item>
-          
+
           <!-- 课程学习 -->
           <el-sub-menu index="learn">
             <template #title>
@@ -52,11 +65,6 @@
             </el-menu-item>
           </el-sub-menu>
 
-          <!-- 创作空间 -->
-          <el-menu-item index="/create">
-            <el-icon><Brush /></el-icon>创作空间
-          </el-menu-item>
-
           <!-- 社区 -->
           <el-sub-menu index="community">
             <template #title>
@@ -73,22 +81,20 @@
             </el-menu-item>
           </el-sub-menu>
 
-          <!-- 学习报告 -->
-          <el-menu-item index="/report">
-            <el-icon><DataAnalysis /></el-icon>学习报告
-          </el-menu-item>
-
          <!-- 用户中心 - 一级菜单（下拉包含登录注册） -->
         <el-sub-menu index="user">
           <template #title>
         <el-icon><User /></el-icon>用户中心
           </template>
-        <el-menu-item index="/user/login">
-          <el-icon><Key /></el-icon>登录
-        </el-menu-item>
-        <el-menu-item index="/user/register">
-          <el-icon><UserFilled /></el-icon>注册
-        </el-menu-item>
+          <el-menu-item index="/user/login">
+            <el-icon><Key /></el-icon>登录
+          </el-menu-item>
+          <el-menu-item index="/user/register">
+            <el-icon><UserFilled /></el-icon>注册
+          </el-menu-item>
+          <el-menu-item index="/user/report">
+            <el-icon><User /></el-icon>个人中心
+          </el-menu-item>
         </el-sub-menu>
 
         </el-menu>
@@ -134,11 +140,32 @@ html, body {
   overflow-x: hidden;
 }
 
+/* 增加少儿编程风格的动态渐变背景色 */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f8fafc;
+  background: linear-gradient(120deg, #f9e7fe, #e0f7fa, #fffde7, #ffe0e7, #e7ffe0, #e0e7ff);
+  background-size: 1200% 1200%;
+  animation: kids-gradient-move 18s ease-in-out infinite;
   color: #1a202c;
   line-height: 1.6;
+}
+
+@keyframes kids-gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 100%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 0%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 #app {
@@ -205,8 +232,8 @@ body {
   flex: 1;
   display: flex;
   justify-content: center;
-  max-width: 1100px; /* 扩大导航区域 */
-  margin: 0 24px; /* 增加左右margin */
+  max-width: 900px; /* 原来可能是1000px或更大，改小一点 */
+  margin: 0 10px;
 }
 
 .app-menu {
@@ -215,30 +242,16 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: space-evenly; /* 改为均匀分布 */
-  gap: 4px; /* 添加间隙 */
+  justify-content: flex-start; /* 改为左对齐或space-between都可以 */
+  gap: 12px; /* 原来gap可能太大，建议8px~16px之间 */
 }
 
 .app-menu .el-menu-item,
 .app-menu .el-sub-menu {
-  height: 44px; /* 增加高度 */
-  line-height: 44px;
-  margin: 0 3px; /* 减少margin，通过gap控制间距 */
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  color: #475569;
-  white-space: nowrap;
-  flex-shrink: 0;
-  font-size: 15px; /* 稍微增大字体 */
-}
-
-.app-menu .el-menu-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 14px; /* 调整padding */
-  min-width: 95px; /* 增加最小宽度 */
+  min-width: 70px; /* 原来可能95px或更大，适当减小 */
+  padding: 0 8px; /* 原来14px，适当减小 */
+  margin: 0 2px;
+  font-size: 15px;
 }
 
 .app-menu .el-sub-menu .el-sub-menu__title {
@@ -348,13 +361,49 @@ body {
   color: #667eea;
 }
 
+/* 左右侧装饰样式 */
+.side-decor {
+  position: fixed;
+  top: 80px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+.side-decor.left {
+  left: 0;
+  gap: 48px; /* 合理的间距 */
+}
+.side-decor.right {
+  right: 0;
+  gap: 48px; /* 合理的间距 */
+}
+.decor-icon {
+  width: 225px;   /* 放大图片 */
+  height: 240px;
+  margin: 16px 0; /* 上下间距适当 */
+  opacity: 0.88;
+}
+.tip {
+  margin-top: 12px; /* 让tip更靠近图片 */
+  font-size: 16px;  /* 字体更大 */
+  color: #7a6ff0;
+  background: #f3f6fd;
+  border-radius: 8px;
+  padding: 8px 18px;
+  text-align: center;
+  box-shadow: 0 2px 8px #e6e6fa40;
+  font-weight: bold; /* 让tip更醒目 */
+}
+
 /* 响应式布局 */
 @media (max-width: 1400px) {
   .header-content {
     max-width: 100%;
     padding: 0 24px;
   }
-  
+
   .nav-section {
     max-width: 800px;
     margin: 0 20px;
@@ -365,12 +414,12 @@ body {
   .header-content {
     padding: 0 16px;
   }
-  
+
   .nav-section {
     max-width: 700px;
     margin: 0 16px;
   }
-  
+
   .app-menu .el-menu-item,
   .app-menu .el-sub-menu {
     margin: 0 2px;
@@ -378,7 +427,7 @@ body {
     font-size: 14px;
     min-width: 80px;
   }
-  
+
   .app-menu .el-sub-menu .el-sub-menu__title {
     padding: 0 10px;
     min-width: 100px;
@@ -405,13 +454,13 @@ body {
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .app-menu .el-menu-item,
   .app-menu .el-sub-menu {
     margin: 4px;
     min-width: auto;
   }
-  
+
   .logo-section {
     min-width: auto;
   }
