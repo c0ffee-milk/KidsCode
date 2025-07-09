@@ -10,7 +10,6 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 // 3. 状态管理
 import { createPinia } from 'pinia'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 // 4. 路由
 import router from './router'
@@ -24,7 +23,7 @@ Object.entries(ElementPlusIconsVue).forEach(([key, component]) => {
 })
 
 // 7. 使用插件
-app.use(createPinia().use(piniaPluginPersistedstate))
+app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)
 
