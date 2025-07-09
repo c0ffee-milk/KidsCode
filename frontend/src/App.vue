@@ -106,7 +106,7 @@
     <router-view />
   </main>
 
-  <footer class="app-footer">
+  <!-- <footer class="app-footer">
     <div class="footer-content">
       <p>© 2025 CodeForKids | 快乐学习，快乐成长</p>
       <div class="footer-links">
@@ -117,7 +117,7 @@
         <a href="#">用户协议</a>
       </div>
     </div>
-  </footer>
+  </footer> -->
 
   <el-backtop :right="50" :bottom="50" />
 </template>
@@ -241,11 +241,20 @@ body {
   gap: 10px;
 }
 
+.app-menu .el-menu-item {
+  border-radius: 12px !important;
+  margin: 0 4px !important;
+}
+
+.app-menu .el-menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
 /* 主内容区 - 全宽度，不限制宽度 */
 .app-main {
   flex: 1;
   width: 100%;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
   min-height: calc(100vh - 160px); /* 调整最小高度适应新的header高度 */
 }
 
