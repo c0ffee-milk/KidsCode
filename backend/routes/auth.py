@@ -62,7 +62,7 @@ def login():
         return jsonify({'error': '系统错误'}), 500
     
 
-@auth_bp.route('/register', methods=['POST']):
+@auth_bp.route('/register', methods=['POST'])
 def register():
     """
     注册服务
