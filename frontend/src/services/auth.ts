@@ -31,5 +31,15 @@ export const authService = {
   async sendSMSCode(phone: string): Promise<{ success: boolean }> {
     const response = await axios.post<{ success: boolean }>(`${API_URL}/auth/send-sms`, { phone })
     return response.data
+  },
+  
+  // 使用短信验证码设置密码
+  async setPasswordWithSMS(phone: string, smsCode: string, newPassword: string): Promise<{ success: boolean }> {
+    const response = await axios.post<{ success: boolean }>(`${API_URL}/auth/set-password`, { 
+      phone, 
+      smsCode, 
+      newPassword 
+    })
+    return response.data
   }
 }

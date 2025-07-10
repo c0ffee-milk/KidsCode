@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import LoginView from '@/views/user/Login.vue'
+import SetPasswordView from '@/views/user/SetPassword.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -24,6 +25,7 @@ const routes = [
   { path: '/user/profile', name: 'UserProfile', component: () => import('@/views/user/Profile.vue')},
   // 登录
   { path: '/login', component: LoginView },
+  { path: '/set-password', component: SetPasswordView },
   // 404
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundView },
 ]

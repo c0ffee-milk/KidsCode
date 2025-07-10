@@ -80,17 +80,14 @@
             </el-menu-item>
           </el-sub-menu>
 
-         <!-- 用户中心 - 一级菜单（下拉包含登录注册） -->
+         <!-- 用户中心 - 一级菜单 -->
         <el-sub-menu index="user">
           <template #title>
         <el-icon><User /></el-icon>用户中心
           </template>
-          <el-menu-item index="/user/report">
-            <el-icon><User /></el-icon>用户画像
-          </el-menu-item>
-          <el-menu-item index="/user/profile">
-            <el-icon><User /></el-icon>个人资料
-          </el-menu-item>
+          <el-menu-item index="/user/report">用户画像</el-menu-item>
+          <el-menu-item index="/user/profile">个人资料</el-menu-item>
+          <el-menu-item index="/set-password">设置密码</el-menu-item>
         </el-sub-menu>
 
         <el-menu-item index="/login">
@@ -182,10 +179,26 @@ body {
   width: 100%;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  /* 确保移除所有边框 */
+  border-bottom: none !important;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
+/* 强制覆盖Element Plus的默认样式 */
+.el-menu--horizontal {
+  border-bottom: none !important;
+}
+
+/* 解决溢出问题 */
+.el-menu--horizontal {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.el-menu--horizontal > .el-menu-item,
+.el-menu--horizontal > .el-sub-menu > .el-sub-menu__title {
+  display: inline-flex;
+}
 .header-content {
   max-width: 1600px; /* 扩大容器宽度 */
   margin: 0 auto;
@@ -203,6 +216,17 @@ body {
   gap: 12px;
   flex-shrink: 0;
   min-width: 200px;
+  /* 增加右边距 */
+  margin-right: 40px;
+}
+
+.nav-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+  /* 增加左边距 */
+  margin-left: 40px;
 }
 
 .app-logo {
