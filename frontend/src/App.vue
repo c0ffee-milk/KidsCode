@@ -266,10 +266,39 @@ body {
 .app-menu .el-menu-item {
   border-radius: 12px !important;
   margin: 0 4px !important;
+  transition: all 0.3s ease;
+  color: #5a5e66;
 }
 
 .app-menu .el-menu-item:hover {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(102, 126, 234, 0.1) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
+.app-menu .el-menu-item.is-active {
+  color: #667eea;
+  font-weight: bold;
+}
+
+.app-menu .el-sub-menu .el-sub-menu__title {
+  transition: all 0.3s ease;
+}
+
+.app-menu .el-sub-menu .el-sub-menu__title:hover {
+  color: #667eea;
+}
+
+.el-icon {
+  transition: all 0.3s ease;
+}
+
+.app-menu .el-menu-item:hover .el-icon {
+  transform: scale(1.2);
+}
+
+.app-menu .el-sub-menu:hover .el-icon {
+  transform: rotate(10deg);
 }
 
 /* 主内容区 - 全宽度，不限制宽度 */
