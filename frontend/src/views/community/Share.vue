@@ -198,6 +198,23 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Star, StarFilled, ChatLineRound, UserFilled } from '@element-plus/icons-vue'
 
+//定义作品类型
+interface Work {
+  id: number;
+  title: string;
+  author: string;
+  authorId: number;
+  category: string;
+  cover: string;
+  description: string;
+  likes: number;
+  comments: number;
+  createTime: string;
+  tags: string[];
+  isLiked: boolean;
+}
+
+
 // 筛选与搜索数据
 const searchQuery = ref('')
 const filterCategory = ref('')
@@ -209,7 +226,9 @@ const publishDialogVisible = ref(false)
 const detailDialogVisible = ref(false)
 
 // 选中的作品
-const selectedWork = ref(null)
+const selectedWork = ref<Work | null>(null)
+
+
 // 作品列表数据
 const works = ref([
     {
@@ -223,7 +242,8 @@ const works = ref([
         likes: 42,
         comments: 8,
         createTime: '2025-06-28',
-        tags: ['游戏', 'Scratch', '太空']
+        tags: ['游戏', 'Scratch', '太空'],
+        isLiked: false 
     },
     {
         id: 2,
@@ -236,7 +256,8 @@ const works = ref([
         likes: 36,
         comments: 5,
         createTime: '2025-06-25',
-        tags: ['游戏', 'Python', '经典']
+        tags: ['游戏', 'Python', '经典'],
+        isLiked: false 
     },
     {
         id: 3,
@@ -249,7 +270,8 @@ const works = ref([
         likes: 28,
         comments: 6,
         createTime: '2025-06-20',
-        tags: ['网站', 'HTML', 'CSS']
+        tags: ['网站', 'HTML', 'CSS'],
+        isLiked: false 
     },
     {
         id: 4,
@@ -262,7 +284,8 @@ const works = ref([
         likes: 55,
         comments: 12,
         createTime: '2025-06-27',
-        tags: ['音乐', 'Web', 'JavaScript']
+        tags: ['音乐', 'Web', 'JavaScript'],
+        isLiked: false 
     },
     {
         id: 5,
@@ -275,7 +298,8 @@ const works = ref([
         likes: 31,
         comments: 9,
         createTime: '2025-06-22',
-        tags: ['游戏', 'Scratch', '动物']
+        tags: ['游戏', 'Scratch', '动物'],
+        isLiked: false 
     },
     {
         id: 6,
@@ -288,7 +312,8 @@ const works = ref([
         likes: 24,
         comments: 4,
         createTime: '2025-06-18',
-        tags: ['工具', 'Python', 'GUI']
+        tags: ['工具', 'Python', 'GUI'],
+        isLiked: false 
     },
     {
         id: 7,
@@ -301,7 +326,8 @@ const works = ref([
         likes: 38,
         comments: 7,
         createTime: '2025-06-26',
-        tags: ['动画', 'Scratch', '艺术']
+        tags: ['动画', 'Scratch', '艺术'],
+        isLiked: false 
     },
     {
         id: 8,
@@ -314,7 +340,8 @@ const works = ref([
         likes: 45,
         comments: 11,
         createTime: '2025-06-24',
-        tags: ['工具', 'Web', '生产力']
+        tags: ['工具', 'Web', '生产力'],
+        isLiked: false 
     },
     {
         id: 9,
@@ -327,7 +354,8 @@ const works = ref([
         likes: 19,
         comments: 3,
         createTime: '2025-06-15',
-        tags: ['游戏', 'Python', '逻辑']
+        tags: ['游戏', 'Python', '逻辑'],
+        isLiked: false 
     },
     {
         id: 10,
@@ -340,7 +368,8 @@ const works = ref([
         likes: 67,
         comments: 15,
         createTime: '2025-06-29',
-        tags: ['游戏', '射击', '动作']
+        tags: ['游戏', '射击', '动作'],
+        isLiked: false 
     },
     {
         id: 11,
@@ -353,7 +382,8 @@ const works = ref([
         likes: 33,
         comments: 8,
         createTime: '2025-06-21',
-        tags: ['相册', 'Web', '摄影']
+        tags: ['相册', 'Web', '摄影'],
+        isLiked: false 
     },
     {
         id: 12,
@@ -366,7 +396,8 @@ const works = ref([
         likes: 26,
         comments: 5,
         createTime: '2025-06-19',
-        tags: ['时钟', 'Python', '工具']
+        tags: ['时钟', 'Python', '工具'],
+        isLiked: false 
     },
     {
         id: 13,
@@ -379,7 +410,8 @@ const works = ref([
         likes: 41,
         comments: 10,
         createTime: '2025-06-23',
-        tags: ['游戏', 'Scratch', '迷宫']
+        tags: ['游戏', 'Scratch', '迷宫'],
+        isLiked: false
     },
     {
         id: 14,
@@ -392,7 +424,8 @@ const works = ref([
         likes: 52,
         comments: 13,
         createTime: '2025-06-28',
-        tags: ['天气', 'Web', '实用']
+        tags: ['天气', 'Web', '实用'],
+        isLiked: false 
     },
     {
         id: 15,
@@ -405,7 +438,8 @@ const works = ref([
         likes: 39,
         comments: 6,
         createTime: '2025-06-17',
-        tags: ['数据', 'Python', '图表']
+        tags: ['数据', 'Python', '图表'],
+        isLiked: false 
     },
     {
         id: 16,
@@ -418,7 +452,8 @@ const works = ref([
         likes: 73,
         comments: 18,
         createTime: '2025-06-30',
-        tags: ['游戏', '经典', '方块']
+        tags: ['游戏', '经典', '方块'],
+        isLiked: false 
     }
 ])
 
@@ -513,7 +548,8 @@ const publishWork = () => {
     likes: 0,
     comments: 0,
     createTime: new Date().toISOString().split('T')[0],
-    tags: newWork.tags
+    tags: newWork.tags,
+    isLiked: false // 新增这一行
   })
 }
 
