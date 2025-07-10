@@ -1,0 +1,1 @@
+2025-07-10 14:41:10,898 ERROR: 初始化应用失败: The current Flask app is not registered with this 'SQLAlchemy' instance. Did you forget to call 'init_app', or did you create multiple 'SQLAlchemy' instances? [in /Users/coffee/Work/VsCode/KidsCode/backend/app.py:18]

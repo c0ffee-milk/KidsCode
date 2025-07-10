@@ -26,6 +26,8 @@ def create_app():
     # 加载配置
     app.config.from_object(config.Config)
 
+    db.init_app(app)
+
     # 配置日志
     if not os.path.exists('logs'):
         os.mkdir('logs')
@@ -90,7 +92,7 @@ def create_app():
         }), 500
     
     # 测试路由
-    @app.route('/ping', method=['GET'])
+    @app.route('/ping', methods=['GET'])
     def ping():
         return jsonify({
             'status': 'success',
@@ -98,7 +100,7 @@ def create_app():
         })
     
     # 刷新 JWT Token
-    @app.route("/refresh", method=['POST'])
+    @app.route("/refresh", methods=['POST'])
     @jwt_required(refresh=True)
     def refresh():
         identity = get_jwt_identity()
@@ -111,10 +113,11 @@ def create_app():
     
     # 初始化应用
     init_app(app)
+    return app
 
-# 创建应用实例
-app = create_app()
 
 # 启动应用
 if __name__ == '__main__':
+    # 创建应用实例
+    app = create_app()
     app.run(host='0.0.0.0', port=5000)
