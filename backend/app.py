@@ -51,7 +51,7 @@ def create_app():
     # 创建蓝图并设置前缀
     from routes.auth import auth_bp
 
-    app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
 
     # 错误处理

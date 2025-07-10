@@ -8,16 +8,17 @@ interface LoginResponse {
     name: string     // 用户名
   }
   token: string      // 认证令牌
+  refresh_token: string      // 刷新令牌
 }
 
 // API基础URL，优先使用环境变量配置
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 // 认证服务
 export const authService = {
   // 使用短信验证码登录
   async loginWithSMS(phone: string, smsCode: string): Promise<LoginResponse> {
-    const response = await axios.post<LoginResponse>(`${API_URL}/auth/sms`, { phone, smsCode })
+    const response = await axios.post<LoginResponse>(`${API_URL}/auth/login`, { phone, smsCode })
     return response.data
   },
 
@@ -29,16 +30,16 @@ export const authService = {
 
   // 发送短信验证码
   async sendSMSCode(phone: string): Promise<{ success: boolean }> {
-    const response = await axios.post<{ success: boolean }>(`${API_URL}/auth/send-sms`, { phone })
+    const response = await axios.post<{ success: boolean }>(`${API_URL}/auth/send-code`, { phone })
     return response.data
   },
-  
+
   // 使用短信验证码设置密码
   async setPasswordWithSMS(phone: string, smsCode: string, newPassword: string): Promise<{ success: boolean }> {
-    const response = await axios.post<{ success: boolean }>(`${API_URL}/auth/set-password`, { 
-      phone, 
-      smsCode, 
-      newPassword 
+    const response = await axios.post<{ success: boolean }>(`${API_URL}/auth/set-password`, {
+      phone,
+      smsCode,
+      newPassword
     })
     return response.data
   }

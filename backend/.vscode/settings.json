@@ -1,0 +1,13 @@
+{
+    "terminal.integrated.profiles.windows": {
+        "Anaconda CMD": {
+            "path": "cmd.exe",
+            "args": ["/K", "F:\\04_Tools\\Utils\\anaconda\\Scripts\\activate.bat F:\\04_Tools\\Utils\\anaconda && conda activate flask_env"]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "Anaconda CMD",
+    "files.exclude": {
+        "**/.git": true,
+        "**/__pycache__": true
+    }
+}
