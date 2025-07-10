@@ -32,8 +32,8 @@ def get_unique_username():
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/login', methods=['POST'])
-def login():
+@auth_bp.route('/login_with_code', methods=['POST'])
+def login_with_code():
     """
     登陆服务
     Args:
@@ -65,8 +65,10 @@ def login():
         user = User.query.filter_by(phone=phone).first()
         if not user:
             name = get_unique_username()
+            password = generate_password_hash(phone)
             user = User(
                 name=name,
+                password=generate_password_hash(password),
                 phone=phone
             )
             # 使用后删除验证码
@@ -112,6 +114,54 @@ def login():
         return jsonify({'error': '系统错误'}), 500
     
 
+@auth_bp.route('/login_with_password', methods=['POST'])
+def login_with_password():
+    """
+    登陆服务
+    Args:
+        phone: 手机号
+        password: 密码
+    返回:
+        成功:
+            message: 登陆成功
+            user_info: {
+                id: 用户id
+                name: 用户名
+                token: 鉴权令牌
+                refresh_token: 刷新令牌
+            }
+        失败:
+            error: 错误信息
+    """
+    try: 
+        phone = request.json.get('phone')
+        password = request.json.get('password')
+        if not all([phone, password]):
+            return jsonify({'error': '缺少必要参数'}), 400
+        
+        user = User.query.filter_by(phone=phone).first()
+        if not user:
+            return jsonify({'error': '用户不存在'}), 404
+        
+        if check_password_hash(user.password, password):
+            # 登陆成功
+            # 生成令牌
+            access_token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id)
+
+            return jsonify({
+                'status': 'success',
+                'message': '登陆成功',
+                'id': user.id,
+            })
+        else:
+            return jsonify({'error': '密码错误'}), 401
+        
+    except Exception as e:
+        logging.error(f"登录过程发生错误: {str(e)}")
+        return jsonify({'error': '系统错误'}), 500
+    
+
 @auth_bp.route('/self_info', methods=['POST'])
 def self_info():
     """
@@ -151,6 +201,7 @@ def update_info():
     Args:
         name: 用户名
         phone: 手机号
+        password: 密码
         code: 验证码
     返回:
         成功:
@@ -166,6 +217,7 @@ def update_info():
         
         name = request.json.get('name')
         phone = request.json.get('phone')
+        password = request.json.get('password')
         code = request.json.get('code')
 
         if not all([name, phone, code]):
@@ -184,6 +236,7 @@ def update_info():
         
         user.name = name
         user.phone = phone
+        user.password = generate_password_hash(password)
         db.session.commit()
         return jsonify({
             'status': 'success',
