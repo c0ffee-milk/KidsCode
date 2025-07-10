@@ -27,17 +27,18 @@
             class="search-input"
           />
           <el-select v-model="filterCategory" placeholder="全部分类" class="filter-select">
-            <el-option label="全部分类" value="" />
-            <el-option label="Scratch" value="scratch" />
-            <el-option label="Python" value="python" />
-            <el-option label="Web" value="web" />
-            <el-option label="游戏" value="game" />
+            <el-option label="🎨 全部分类" value="" />
+            <el-option label="🎯 Scratch" value="scratch" />
+            <el-option label="🐍 Python" value="python" />
+            <el-option label="🌐 Web开发" value="web" />
+            <el-option label="🎮 游戏开发" value="game" />
           </el-select>
-        </div>
-        <!-- 3. 温馨提示区 -->
-        <div class="tips-banner">
-          <el-icon style="color: #fbbf24; font-size: 22px; margin-right: 6px;"><StarFilled /></el-icon>
-          <span>欢迎来到作品分享乐园！你可以浏览、点赞、评论同学们的作品，也可以发布自己的创意项目哦！</span>
+          <el-select v-model="sortBy" placeholder="排序方式" class="sort-select">
+            <el-option label="📅 最新发布" value="newest" />
+            <el-option label="👍 点赞最多" value="likes" />
+            <el-option label="💬 评论最多" value="comments" />
+            <el-option label="🔥 最受欢迎" value="popular" />
+          </el-select>
         </div>
       </div>
     </div>
@@ -200,6 +201,7 @@ import { Star, StarFilled, ChatLineRound, UserFilled } from '@element-plus/icons
 // 筛选与搜索数据
 const searchQuery = ref('')
 const filterCategory = ref('')
+const sortBy = ref('newest')
 const currentPage = ref(1)
 
 // 弹窗控制
@@ -431,7 +433,7 @@ const newWork = reactive({
 
 // 根据筛选条件过滤作品
 const filteredWorks = computed(() => {
-  return works.value.filter(work => {
+  let filtered = works.value.filter(work => {
     // 按分类筛选
     if (filterCategory.value && work.category !== filterCategory.value) {
       return false
@@ -442,6 +444,24 @@ const filteredWorks = computed(() => {
     }
     return true
   })
+  
+  // 排序
+  switch (sortBy.value) {
+    case 'newest':
+      filtered.sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime())
+      break
+    case 'likes':
+      filtered.sort((a, b) => b.likes - a.likes)
+      break
+    case 'comments':
+      filtered.sort((a, b) => b.comments - a.comments)
+      break
+    case 'popular':
+      filtered.sort((a, b) => (b.likes + b.comments * 2) - (a.likes + a.comments * 2))
+      break
+  }
+  
+  return filtered
 })
 
 const pageSize = 12
@@ -552,36 +572,30 @@ const getCategoryName = (category: string) => {
   min-height: 100vh;
   box-shadow: 0 0 20px rgba(0,0,0,0.05);
   border-radius: 0;
+  padding-top: 240px; /* 增加更多顶部padding：导航栏80px + 标题区80px + 额外间距80px */
 }
 
-/* 移除或禁用背景层，避免影响滚动 */
-.share-page::before {
-  display: none;
-}
-
-/* 修复页面标题区的margin */
 .page-header {
+  position: fixed;
+  top: 80px; /* 导航栏高度 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   justify-content: space-between; 
   align-items: center;
   gap: 24px;
   flex-wrap: wrap;
-  margin-bottom: 24px;
+  margin-bottom: 0;
   margin-top: 0; 
-  padding-top: 20px; 
-}
-
-.page-header h1 {
-  font-size: 32px;
-  color: #f59e42;
-  margin: 0;
-  font-family: 'Comic Sans MS', '幼圆', cursive;
-  letter-spacing: 2px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
+  padding: 16px 24px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 16px rgba(251,191,36,0.12);
+  border: 1px solid rgba(255,231,194,0.4);
 }
 
 .publish-btn {
@@ -597,13 +611,11 @@ const getCategoryName = (category: string) => {
 /*此处不使用全局渐变色 不然太花了 */
 .filter-sticky {
   position: sticky;
-  top: 64px;
+  top: 160px; 
   z-index: 20;
-  /* background: linear-gradient(135deg, #f0f9ff 0%, #fef6e4 100%); */
   background: rgba(255,255,255,0.92);
   box-shadow: 0 2px 8px rgba(251,191,36,0.04);
-  padding: 12px 0;
-  margin-bottom: 18px;
+  padding: 0 0;/* 增加内边距 */
   margin-top: 0;
   border-radius: 8px;
 }
@@ -619,90 +631,156 @@ const getCategoryName = (category: string) => {
   display: flex;
   gap: 16px;
   margin-bottom: 14px;
-  padding: 14px 18px 10px 18px;
-  background: rgba(255,255,255,0.85);
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 2px 8px rgba(251,191,36,0.04);
+  padding: 16px 20px 14px 20px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 3px 12px rgba(251,191,36,0.06);
   flex-wrap: wrap;
-  border-bottom: 1.5px solid #ffe7c2;
+  border-bottom: 2px solid #ffe7c2;
+  align-items: center;
 }
 
 .search-input {
-  width: 340px;
+  width: 280px;
   max-width: 100%;
-  min-width: 180px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #fffbe9 0%, #fff8f0 100%);
-  border: 2px solid #ffe7c2;
-  box-shadow: 0 3px 12px rgba(251,191,36,0.1);
-  transition: all 0.3s ease;
-  font-size: 16px;
-  padding-left: 16px;
-  height: 42px;
+  min-width: 200px;
+  height: 40px; /* 改为40px，与下拉框保持一致 */
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #dcdfe6;
+  box-shadow: none;
+  transition: border-color 0.2s;
+  font-size: 15px;
+  margin-bottom: 0;
 }
 
 .search-input:focus-within {
-  border-color: #fbbf24;
-  box-shadow: 0 0 0 3px rgba(251,191,36,0.2), 0 4px 16px rgba(251,191,36,0.15);
-  transform: translateY(-1px);
+  border-color: #409eff;
+  box-shadow: none;
+  transform: none;
+  background: #ffffff;
 }
 
 .search-input:hover {
+  border-color: #c0c4cc;
+  box-shadow: none;
+}
+
+/* 保持 el-input 内部组件的简约样式 */
+.search-input :deep(.el-input__wrapper) {
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  height: 40px; /* 确保内部wrapper也是40px */
+}
+
+.search-input :deep(.el-input__wrapper):hover {
+  border: none;
+  box-shadow: none;
+}
+
+.search-input :deep(.el-input__wrapper.is-focus) {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.filter-select, .sort-select {
+  width: 150px;
+  height: 40px; /* 确保外层容器也是40px */
+  border-radius: 22px;
+  min-width: 140px;
+}
+
+/* 为 el-select 添加样式覆盖 */
+.filter-select :deep(.el-input__wrapper),
+.sort-select :deep(.el-input__wrapper) {
+  border-radius: 22px;
+  border: 2px solid #ffe7c2;
+  background: linear-gradient(135deg, #f0f9ff 0%, #fef6e4 100%);
+  box-shadow: 0 2px 8px rgba(251,191,36,0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 40px; /* 确保一致的高度 */
+}
+
+.filter-select :deep(.el-input__wrapper):hover,
+.sort-select :deep(.el-input__wrapper):hover {
+  border-color: #f59e42;
+  box-shadow: 0 3px 12px rgba(251,191,36,0.1);
+}
+
+.filter-select :deep(.el-input__wrapper.is-focus),
+.sort-select :deep(.el-input__wrapper.is-focus) {
   border-color: #fbbf24;
-  box-shadow: 0 4px 16px rgba(251,191,36,0.12);
+  box-shadow: 0 0 0 3px rgba(251,191,36,0.15), 0 4px 16px rgba(251,191,36,0.12);
+  background: #ffffff;
 }
 
-.filter-select {
-  width: 160px;
-  border-radius: 16px;
-  min-width: 120px;
+/* 下拉菜单样式优化 */
+.filter-select :deep(.el-select-dropdown),
+.sort-select :deep(.el-select-dropdown) {
+  border-radius: 12px;
+  border: 2px solid #ffe7c2;
+  box-shadow: 0 8px 32px rgba(251,191,36,0.12);
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
 }
 
-.tips-banner {
-  display: flex;
-  align-items: center;
-  background: linear-gradient(90deg, #fffbe9 0%, #e0f7fa 100%);
-  border-radius: 0 0 16px 16px;
-  padding: 14px 24px 14px 22px;
-  margin-bottom: 0;
-  font-size: 17px;
+.filter-select :deep(.el-select-dropdown__item),
+.sort-select :deep(.el-select-dropdown__item) {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  margin: 2px 8px;
+  transition: all 0.2s;
+}
+
+.filter-select :deep(.el-select-dropdown__item:hover),
+.sort-select :deep(.el-select-dropdown__item:hover) {
+  background: linear-gradient(135deg, #fffbe9 0%, #fff5e6 100%);
   color: #f59e42;
-  box-shadow: 0 4px 16px rgba(251,191,36,0.08);
-  font-family: 'Comic Sans MS', '幼圆', cursive;
-  border-top: 1.5px solid #ffe7c2;
-  min-height: 44px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
-.tips-banner .el-icon {
-  margin-right: 8px;
-  font-size: 22px;
-  color: #fbbf24;
+.filter-select :deep(.el-select-dropdown__item.selected),
+.sort-select :deep(.el-select-dropdown__item.selected) {
+  background: linear-gradient(135deg, #fbbf24 0%, #34d399 100%);
+  color: white;
+  font-weight: 500;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .share-page {
+    padding-top: 280px; /* 移动端需要更多空间 */
+  }
+  
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
+    padding: 12px 16px;
+    height: auto; /* 移动端高度自适应 */
   }
   
   .publish-btn {
     align-self: flex-end;
   }
   
+  .filter-sticky {
+    top: 220px; /* 移动端调整粘性定位 */
+  }
+  
   .filter-section {
     flex-direction: column;
     gap: 12px;
-    padding: 12px 8px 8px 8px;
-    border-radius: 12px 12px 0 0;
+    padding: 14px 16px 12px 16px;
+    align-items: stretch;
   }
-  .tips-banner {
-    padding: 12px 10px 12px 12px;
-    border-radius: 0 0 12px 12px;
-    font-size: 15px;
+  
+  .search-input, .filter-select, .sort-select {
+    width: 100%;
+    min-width: auto;
   }
 }
 
