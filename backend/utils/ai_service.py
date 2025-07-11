@@ -82,3 +82,8 @@ class AIService:
         except Exception as e:
             logging.error(f"AI服务调用错误: {str(e)}")
             return False
+        
+    def ai_judge(self, subject, content):
+        """
+        
+        """
