@@ -76,13 +76,19 @@ export const authService = {
   async getSelfInfo(): Promise<{ phone: string; name: string }> {
     console.log('Token type:', typeof localStorage.getItem('token'));
     console.log('Token value:', localStorage.getItem('token'));
-    const response = await axios.get<{ phone: string; name: string }>(`${API_URL}/auth/self_info`, {
+    const response = await axios.post<{
+        status: string;
+        message: string;
+        name: string;
+        phone: string
+    }>(`${API_URL}/auth/self_info`, {}, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
 
-    console.log('响应数据:', response.data);
-    return response.data;
-  },
-}
+    return {
+        phone: response.data.phone,
+        name: response.data.name
+    };
+}}

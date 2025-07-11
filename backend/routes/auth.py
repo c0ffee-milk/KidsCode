@@ -164,7 +164,7 @@ def login_with_password():
         return jsonify({'error': '系统错误'}), 500
     
 
-@auth_bp.route('/self_info', methods=['GET'])
+@auth_bp.route('/self_info', methods=['POST'])
 @jwt_required()
 def self_info():
     """
