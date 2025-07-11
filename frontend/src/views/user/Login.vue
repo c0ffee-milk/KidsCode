@@ -22,7 +22,7 @@
         </div>
         <div class="form-group">
           <input type="text" placeholder="请输入验证码" v-model="smsCode">
-          <button class="get-code-btn" :disabled="countdown > 0" @click="sendSMSCode">
+          <button class="get-code-btn" :disabled="countdown > 0" @click="sendSMSCode" type="button">
             {{ countdown > 0 ? countdown + '秒后重发' : '获取验证码' }}
           </button>
         </div>
