@@ -66,6 +66,10 @@ export const authService = {
       name,
       code,
       ...(password && { password })
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
     });
 
     console.log('响应数据:', response.data);

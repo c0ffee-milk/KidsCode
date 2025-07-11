@@ -12,7 +12,7 @@
         </div>
         <div class="form-group">
           <input type="text" placeholder="请输入验证码" v-model="smsCode">
-          <button class="get-code-btn" :disabled="countdown > 0" @click="sendSMSCode">
+          <button class="get-code-btn" :disabled="countdown > 0" @click="sendSMSCode" type="button">
             {{ countdown > 0 ? countdown + '秒后重发' : '获取验证码' }}
           </button>
         </div>
@@ -38,6 +38,7 @@
 import { ref, onMounted } from 'vue';
 import { authService } from '@/services/auth';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 const phone = ref('');
 const name = ref('');
@@ -73,13 +74,14 @@ async function sendSMSCode(): Promise<void> {
 
   try {
     await authService.sendSMSCode(phone.value);
+    ElMessage.success({ message: '验证码已发送，请注意查收', offset: 180 });
     countdown.value = 60;
     const timer = setInterval(() => {
       countdown.value--;
       if (countdown.value <= 0) clearInterval(timer);
     }, 1000);
   } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || '发送验证码失败';
+    ElMessage.error({ message: error.response?.data?.message || '发送验证码失败', offset: 180 });
   }
 }
 
