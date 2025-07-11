@@ -91,6 +91,7 @@
           <el-menu-item index="/user/report">用户画像</el-menu-item>
           <el-menu-item index="/user/profile">个人资料</el-menu-item>
           <el-menu-item index="/user/set">设置用户信息</el-menu-item>
+          <el-menu-item index="" @click="handleLogout">退出登录</el-menu-item>
         </el-sub-menu>
 
         <el-menu-item index="/login">
@@ -123,6 +124,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+
+const router = useRouter()
+const userStore = useUserStore()
+
+const handleLogout = () => {
+  userStore.clear()
+  router.push('/')
+}
 
 </script>
 
