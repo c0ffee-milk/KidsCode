@@ -1,6 +1,6 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from extensions import db, jwt
+from extensions import db
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from model import User, VerificationCode
 import requests
@@ -15,6 +15,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 import random
 import string
+
+auth_bp = Blueprint('auth', __name__)
 
 def generate_random_username(length=10):
     prefix = "user_"
@@ -163,6 +165,7 @@ def login_with_password():
     
 
 @auth_bp.route('/self_info', methods=['POST'])
+@jwt_required()
 def self_info():
     """
     编辑用户信息
@@ -195,6 +198,7 @@ def self_info():
 
 
 @auth_bp.route('/update-info', methods=['POST'])
+@jwt_required()
 def update_info():
     """
     更新用户信息
