@@ -529,22 +529,38 @@ const userCompetitionStats = ref({
 })
 
 // 精选竞赛
-const highlightCompetitions = ref([
+const highlightCompetitions = ref<Competition[]>([
   {
     id: 1,
     title: '全国青少年编程挑战赛',
     description: '面向全国中小学生的编程竞赛，展示编程才华',
     cover: 'https://placeholder.pics/svg/300x150/667eea/white/全国编程赛',
+    category: 'scratch',
+    difficulty: 'intermediate',
     status: 'upcoming',
-    participants: 1250
+    startDate: '2025-03-01',
+    endDate: '2025-03-15',
+    registrationDeadline: '2025-02-20',
+    participants: 1250,
+    registered: false,
+    rewards: '冠军证书+奖金+编程学习资源',
+    rules: '个人参赛，需在规定时间内完成编程任务，评审标准包括代码质量、创新性等'
   },
   {
     id: 2,
     title: 'Scratch创意动画赛',
     description: '用Scratch制作创意动画，发挥想象力',
     cover: 'https://placeholder.pics/svg/300x150/10b981/white/Scratch动画',
+    category: 'scratch',
+    difficulty: 'beginner',
     status: 'ongoing',
-    participants: 856
+    startDate: '2025-01-15',
+    endDate: '2025-02-15',
+    registrationDeadline: '2025-01-31',
+    participants: 856,
+    registered: false,
+    rewards: '优秀作品展示+证书+编程套件',
+    rules: '提交原创Scratch动画作品，主题自选，时长不超过3分钟'
   }
 ])
 
@@ -699,31 +715,31 @@ const handleTabChange = (tab: string) => {
 }
 
 const getCategoryName = (category: string) => {
-  const categoryMap = {
+  const categoryMap: Record<string, string> = {
     'scratch': 'Scratch',
     'python': 'Python',
     'web': 'Web开发',
     'game': '游戏开发'
   }
-  return categoryMap[category] || category
+  return categoryMap[category] ?? category
 }
 
 const getStatusText = (status: string) => {
-  const statusMap = {
+  const statusMap: Record<string, string> = {
     'upcoming': '即将开始',
     'ongoing': '进行中',
     'ended': '已结束'
   }
-  return statusMap[status] || '未知'
+  return statusMap[status] ?? '未知'
 }
 
 const getStatusColor = (status: string) => {
-  const colorMap = {
+  const colorMap: Record<string, string> = {
     'upcoming': 'info',
     'ongoing': 'success',
     'ended': 'warning'
   }
-  return colorMap[status] || 'default'
+  return colorMap[status] ?? 'default'
 }
 
 const isRegistrationClosed = (comp: Competition) => {
