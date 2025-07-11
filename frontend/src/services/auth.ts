@@ -74,11 +74,14 @@ export const authService = {
 
   // 获取当前用户信息
   async getSelfInfo(): Promise<{ phone: string; name: string }> {
+    console.log('Token type:', typeof localStorage.getItem('token'));
+    console.log('Token value:', localStorage.getItem('token'));
     const response = await axios.get<{ phone: string; name: string }>(`${API_URL}/auth/self_info`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
+
     console.log('响应数据:', response.data);
     return response.data;
   },
