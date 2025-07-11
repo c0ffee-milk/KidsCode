@@ -4,16 +4,13 @@
     <div class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
-          <h1 class="hero-title">欢迎来到少儿编程世界</h1>
+          <h1 class="hero-title"> CodeForKids</h1>
+          <h1 class="hero-title"> 少儿编程世界</h1>
           <p class="hero-subtitle">通过有趣的游戏学习编程基础</p>
           <div class="action-buttons">
             <el-button type="primary" size="large" @click="router.push('/learn')">
               <el-icon><Edit /></el-icon>
-              开始学习
-            </el-button>
-            <el-button size="large" @click="router.push('/register')">
-              <el-icon><UserFilled /></el-icon>
-              注册账号
+              点击开启学习之旅吧！
             </el-button>
           </div>
         </div>
@@ -113,23 +110,24 @@ const stats = [
   width: 100%;
   min-height: calc(100vh - 144px);
   padding-top: 700px;
+  border-radius: 20px;
 }
 
 /* Hero 区域 - 全宽度背景 */
 .hero-section {
   width: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.9) 100%);
   padding: 80px 0;
 }
 
 .hero-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 200px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 60px;
   align-items: center;
+  justify-items: center;
 }
 
 .hero-title {
@@ -157,9 +155,9 @@ const stats = [
 }
 
 .action-buttons .el-button {
-  padding: 16px 32px;
-  border-radius: 50px;
-  font-size: 16px;
+  padding: 32px 40px;
+  border-radius: 30px;
+  font-size: 20px;
   font-weight: 600;
 }
 
@@ -203,7 +201,7 @@ const stats = [
 .features-section {
   width: 100%;
   background: white;
-  padding: 80px 0;
+
 }
 
 .features-container {
@@ -284,7 +282,7 @@ const stats = [
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 60px 0;
   border-radius: 20px;
-  margin: 0 auto;
+  margin: 80px auto 0 auto;
 }
 
 
