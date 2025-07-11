@@ -90,7 +90,7 @@
           </template>
           <el-menu-item index="/user/report">用户画像</el-menu-item>
           <el-menu-item index="/user/profile">个人资料</el-menu-item>
-          <el-menu-item index="/user/set">设置用户信息</el-menu-item>
+          <el-menu-item index="/user/set">设置昵称和密码</el-menu-item>
           <el-menu-item index="" @click="handleLogout">退出登录</el-menu-item>
         </el-sub-menu>
 

@@ -1,14 +1,13 @@
 <template>
   <div class="profile-container">
-    <h1>用户画像</h1>
-    
+
     <!-- 用户基本信息 -->
     <div class="user-basic-info">
-      <h2>{{ userInfo.nickname }}</h2>
+      <h2>{{ userInfo.name }}</h2>
       <p>年龄: {{ userInfo.age }}</p>
       <p>学习时长: {{ userInfo.studyHours }}小时</p>
     </div>
-    
+
     <!-- 课程完成进度 -->
     <div class="progress-chart">
       <h3>课程完成进度</h3>
@@ -17,11 +16,18 @@
       </div>
       <p>{{ completedCourses }} / {{ totalCourses }} 课程</p>
     </div>
-    
-    <!-- 能力雷达图 -->
-    <div class="ability-radar">
-      <h3>能力评估</h3>
-      <div ref="radarChart" style="width: 400px; height: 300px;"></div>
+
+    <!-- 能力雷达图和评价 -->
+    <div class="ability-container">
+      <div class="ability-radar">
+        <h3>能力评估</h3>
+        <div ref="radarChart" style="width: 400px; height: 300px;"></div>
+      </div>
+
+      <div class="ability-evaluation">
+        <h3>整体评价</h3>
+        <p>{{ evaluationText }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -31,7 +37,7 @@ import { ref, onMounted } from 'vue';
 import * as echarts from 'echarts';
 
 const userInfo = ref({
-  nickname: '编程小能手',
+  name: '编程小能手',
   age: 10,
   studyHours: 120
 });
@@ -64,9 +70,36 @@ onMounted(() => {
     chart.setOption(option);
   }
 });
+
+const evaluationText = ref('该学员在代码规范方面表现优秀，逻辑思维和空间想象能力较强，创造力和问题解决能力有待进一步提升。');
 </script>
 
 <style scoped>
+.profile-container {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+h2, h3 {
+  font-weight: 600;
+  color: #333;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #666;
+}
+
+.user-basic-info h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.ability-evaluation p {
+  font-size: 15px;
+  line-height: 1.8;
+}
+
 .profile-container {
   padding: 20px;
   max-width: 800px;
@@ -102,6 +135,18 @@ onMounted(() => {
 }
 
 .ability-radar {
+  padding: 20px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.ability-container {
+  display: flex;
+  gap: 20px;
+}
+
+.ability-evaluation {
+  flex: 1;
   padding: 20px;
   background: #f5f7fa;
   border-radius: 8px;
