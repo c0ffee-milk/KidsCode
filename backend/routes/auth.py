@@ -155,6 +155,9 @@ def login_with_password():
                 'status': 'success',
                 'message': '登陆成功',
                 'id': user.id,
+                'name': user.name,
+                'token': access_token,
+                'refresh_token': refresh_token
             })
         else:
             return jsonify({'error': '密码错误'}), 401
