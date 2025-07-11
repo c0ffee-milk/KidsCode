@@ -27,6 +27,7 @@ def create_app():
     app.config.from_object(config.Config)
 
     db.init_app(app)
+    jwt.init_app(app)
 
     # 配置日志
     if not os.path.exists('logs'):
