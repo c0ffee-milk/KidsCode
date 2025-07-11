@@ -80,8 +80,8 @@ def login_with_code():
             db.session.commit()
 
             # 生成令牌
-            access_token = create_access_token(identity=user.id)
-            refresh_token = create_refresh_token(identity=user.id)
+            access_token = create_access_token(identity=str(user.id))
+            refresh_token = create_refresh_token(identity=str(user.id))
 
             return jsonify({
                 'status': 'success',
@@ -99,8 +99,8 @@ def login_with_code():
             db.session.commit()
 
             # 生成令牌
-            access_token = create_access_token(identity=user.id)
-            refresh_token = create_refresh_token(identity=user.id)
+            access_token = create_access_token(identity=str(user.id))
+            refresh_token = create_refresh_token(identity=str(user.id))
 
             return jsonify({
                 'status': 'success',
@@ -148,8 +148,8 @@ def login_with_password():
         if check_password_hash(user.password, password):
             # 登陆成功
             # 生成令牌
-            access_token = create_access_token(identity=user.id)
-            refresh_token = create_refresh_token(identity=user.id)
+            access_token = create_access_token(identity=str(user.id))
+            refresh_token = create_refresh_token(identity=str(user.id))
 
             return jsonify({
                 'status': 'success',
