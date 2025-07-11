@@ -54,7 +54,7 @@ class AIService:
 
                         回答格式：
                         {
-                            "is_right": true/false,
+                            "is_right": True/False,
                             "analysis": "..."
                         }
 
@@ -85,5 +85,41 @@ class AIService:
         
     def ai_judge(self, subject, content):
         """
-        
+        ai判定
+
+        Args:
+            subject: 题目
+            content: 回答
+
+        返回:
+            成功:
+                message: success
+                is_right: True/False
+            失败:
+                error: 错误信息
         """
+        try:
+            if not self.client:
+                return False
+            
+            # 构建提示词
+            system_prompt = f"""
+                                注意，你是一名少儿编程教育老师，你的任务是根据题目判断用户的回答是否正确，请按照用户的回答推理一遍，确认是否能完成题目任务。
+                                返回的格式为True/False：True表示正确，False表示错误。
+                                注意，你返回的内容只能为True或者False，请勿返回任何多余的字符
+                            """
+            
+            user_prompt = f"""
+                        题目：{subject}
+                        用户答案：{content}
+                        """
+            
+            completion = openai.client.chat.completions.create(
+                model="qwen-turbo",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=0.1,
+                max_tokens=1024,
+            )
