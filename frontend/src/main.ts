@@ -7,6 +7,7 @@ import App from './App.vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import * as echarts from 'echarts'
 
 // 3. 状态管理
 import { createPinia } from 'pinia'
@@ -23,6 +24,7 @@ Object.entries(ElementPlusIconsVue).forEach(([key, component]) => {
 })
 
 // 7. 使用插件
+app.config.globalProperties.$echarts = echarts
 app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)

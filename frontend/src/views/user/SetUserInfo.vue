@@ -1,11 +1,14 @@
 <template>
   <div class="login-container">
     <div class="login-content">
-      <h2 class="login-title">设置新密码</h2>
+      <h2 class="login-title">设置用户信息</h2>
 
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <input type="tel" placeholder="请输入手机号" v-model="phone">
+        </div>
+        <div class="form-group">
+          <input type="text" placeholder="请输入用户名" v-model="name">
         </div>
         <div class="form-group">
           <input type="text" placeholder="请输入验证码" v-model="smsCode">
@@ -32,11 +35,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { authService } from '@/services/auth';
 import { useRouter } from 'vue-router';
 
 const phone = ref('');
+const name = ref('');
 const smsCode = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
@@ -52,10 +56,15 @@ async function handleSubmit(): Promise<void> {
       return;
     }
 
-    await authService.setPasswordWithSMS(phone.value, smsCode.value, newPassword.value);
+    await authService.updateUserInfo(
+      phone.value,
+      name.value,
+      smsCode.value,
+      newPassword.value
+    );
     router.push('/login');
   } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || '设置密码失败';
+    errorMessage.value = error.response?.data?.message || '设置用户信息失败';
   }
 }
 
@@ -73,6 +82,16 @@ async function sendSMSCode(): Promise<void> {
     errorMessage.value = error.response?.data?.message || '发送验证码失败';
   }
 }
+
+onMounted(async () => {
+  try {
+    const userInfo = await authService.getSelfInfo();
+    phone.value = userInfo.phone;
+    name.value = userInfo.name;
+  } catch (error) {
+    errorMessage.value = '获取用户信息失败';
+  }
+});
 </script>
 
 <style scoped>
