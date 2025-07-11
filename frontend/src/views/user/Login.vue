@@ -22,11 +22,12 @@
         </div>
         <div class="form-group">
           <input type="text" placeholder="请输入验证码" v-model="smsCode">
-          <button class="get-code-btn" :disabled="countdown > 0" @click="sendSMSCode">
+          <button class="get-code-btn" :disabled="countdown > 0" @click="sendSMSCode" type="button">
             {{ countdown > 0 ? countdown + '秒后重发' : '获取验证码' }}
           </button>
         </div>
         <button type="submit" class="submit-btn">登录</button>
+        <router-link to="/user/set" class="set-password-link">设置密码？</router-link>
       </form>
 
       <form v-else @submit.prevent="handleSubmit">
@@ -37,6 +38,7 @@
           <input type="password" placeholder="请输入密码" v-model="password">
         </div>
         <button type="submit" class="submit-btn">登录</button>
+        <router-link to="/user/set" class="set-password-link">设置密码？</router-link>
       </form>
     </div>
 
@@ -268,5 +270,17 @@ async function sendSMSCode(): Promise<void> {
   25% { transform: translate(15px, 20px); }
   50% { transform: translate(-10px, 25px); }
   75% { transform: translate(20px, -15px); }
+}
+
+.set-password-link {
+  display: inline-block;
+  margin-top: 15px;
+  color: #3498db;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.set-password-link:hover {
+  color: #2980b9;
 }
 </style>
