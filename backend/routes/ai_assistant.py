@@ -4,7 +4,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from model import User, VerificationCode
 from config import Config
 import logging
-from services.ai_service import AIService
+from backend.utils.ai_service import AIService
 
 ai_bp = Blueprint('ai', __name__)
 

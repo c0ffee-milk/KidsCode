@@ -38,7 +38,9 @@ def send_sms(phone, code):
 def save_verification_code(phone, code):
     existing = VerificationCode.query.filter_by(phone=phone).first()
     if existing:
-        existing.code = code
+        db.session.delete(existing)
+        new_code = VerificationCode(phone=phone, code=code, created_at=datetime.now())
+        db.session.add(new_code)
     else:
         new_code = VerificationCode(phone=phone, code=code, created_at=datetime.now())
         db.session.add(new_code)
