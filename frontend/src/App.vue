@@ -78,6 +78,9 @@
             <el-menu-item index="/community/competition">
               <el-icon><Medal /></el-icon>编程竞赛
             </el-menu-item>
+            <el-menu-item index="/community/competitioncenter">
+              <el-icon><Trophy /></el-icon>竞赛中心
+            </el-menu-item>
           </el-sub-menu>
 
          <!-- 用户中心 - 一级菜单 -->

@@ -20,6 +20,7 @@ const routes = [
   { path: '/community/share', name: 'CommunityShare', component: () => import('@/views/community/Share.vue') },
   { path: '/community/forum', name: 'CommunityForum', component: () => import('@/views/community/Forum.vue') },
   { path: '/community/competition', name: 'CommunityCompetition', component: () => import('@/views/community/Competition.vue') },
+  { path: '/community/competitioncenter',name:'CommunityCompetitionCenter', component: () => import('@/views/community/CompetitionCenter.vue')},
   // 用户中心
   { path: '/user/report', name: 'UserReport', component: () => import('@/views/user/Report.vue') },
   { path: '/user/profile', name: 'UserProfile', component: () => import('@/views/user/Profile.vue')},

@@ -75,7 +75,7 @@ async function handleSubmit(): Promise<void> {
     }
 
     userStore.setUser(response.user);
-    userStore.setToken(response.token);
+    userStore.setTokens(response.token,response.refresh_token);
     router.push('/');
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || '登录失败';
