@@ -8,6 +8,14 @@
       <p>学习时长: {{ userInfo.studyHours }}小时</p>
     </div>
 
+    <!-- 热力图 -->
+    <div class="heatmap-container">
+      <h3>学习热力图</h3>
+      <div class="heatmap-content">
+        <!-- 这里放置热力图内容 -->
+      </div>
+    </div>
+
     <!-- 课程完成进度 -->
     <div class="progress-chart">
       <h3>课程完成进度</h3>
@@ -101,7 +109,7 @@ p {
 }
 
 .profile-container {
-  padding: 20px;
+  padding-top: 200px;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -111,6 +119,26 @@ p {
   padding: 20px;
   background: #f5f7fa;
   border-radius: 8px;
+}
+
+.heatmap-container {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.heatmap-container h3 {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.heatmap-content {
+  min-height: 200px;
+  background: white;
+  border-radius: 4px;
+  padding: 15px;
 }
 
 .progress-chart {

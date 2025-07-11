@@ -112,6 +112,7 @@ const stats = [
 .home-page {
   width: 100%;
   min-height: calc(100vh - 144px);
+  padding-top: 700px;
 }
 
 /* Hero 区域 - 全宽度背景 */
