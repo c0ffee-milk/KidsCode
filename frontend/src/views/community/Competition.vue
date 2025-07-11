@@ -37,6 +37,9 @@
       </div>
     </div>
 
+    <div class="header-spacer"></div>
+
+
     <!-- 主要内容区域 -->
     <div class="content-wrapper">
       <!-- 竞赛列表 -->
@@ -454,6 +457,13 @@ function getJoinButtonText(comp: Competition) {
 .filter-select {
   width: 150px;
 }
+
+/*过渡区 */
+.header-spacer{
+  height: 30px; 
+  width: 100%;
+}
+
 
 /* 主要内容区域 - 关键：flex-grow 确保占满剩余空间 */
 .content-wrapper {
