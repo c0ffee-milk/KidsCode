@@ -48,7 +48,7 @@
             </el-menu-item>
           </el-sub-menu>
 
-          <!-- 练习中心 -->
+          <!-- 练习中心
           <el-sub-menu index="practice">
             <template #title>
               <el-icon><Cpu /></el-icon>练习中心
@@ -62,7 +62,7 @@
             <el-menu-item index="/practice/project">
               <el-icon><FolderOpened /></el-icon>项目实战
             </el-menu-item>
-          </el-sub-menu>
+          </el-sub-menu> -->
 
           <!-- 社区 -->
           <el-sub-menu index="community">
@@ -193,7 +193,6 @@ body {
   width: 100%;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
-  /* 确保移除所有边框 */
   border-bottom: none !important;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -220,7 +219,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px; /* 增加左右padding */
+  padding: 0 40px; /* 增加左右padding */
   height: 80px; /* 增加高度 */
   width: 100%;
   box-sizing: border-box;
@@ -248,7 +247,7 @@ body {
   justify-content: center;
   max-width: 100%;
   /* 增加左边距 */
-  margin-left: 40px;
+  margin-left: 120px;
 }
 
 .app-logo {
@@ -272,7 +271,7 @@ body {
   display: flex;
   justify-content: center;
   max-width: 100%;
-  margin: 0 10px;
+  margin: 0 340px;
 }
 
 .app-menu {
