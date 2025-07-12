@@ -14,7 +14,7 @@
 
   <header class="app-header">
     <div class="header-content">
-      <div class="logo-section">
+      <div class="logo-section" @click="router.push('/')">
         <img src="/favicon.svg" class="app-logo" />
         <span class="app-title">CodeForKids</span>
       </div>
@@ -234,6 +234,12 @@ body {
   min-width: 200px;
   /* 增加右边距 */
   margin-right: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logo-section:hover {
+  transform: scale(1.02);
 }
 
 .nav-section {
