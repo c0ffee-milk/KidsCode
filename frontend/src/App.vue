@@ -84,7 +84,7 @@
           </el-sub-menu>
 
          <!-- 用户中心 - 一级菜单 -->
-        <el-sub-menu index="user">
+        <el-sub-menu v-if="userStore.token" index="user">
           <template #title>
         <el-icon><User /></el-icon>用户中心
           </template>
@@ -94,7 +94,7 @@
           <el-menu-item index="" @click="handleLogout">退出登录</el-menu-item>
         </el-sub-menu>
 
-        <el-menu-item index="/login">
+        <el-menu-item v-else index="/login">
             登录
           </el-menu-item>
         </el-menu>
@@ -196,6 +196,7 @@ body {
   /* 确保移除所有边框 */
   border-bottom: none !important;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 /* 强制覆盖Element Plus的默认样式 */
@@ -214,14 +215,15 @@ body {
   display: inline-flex;
 }
 .header-content {
-  max-width: 1600px; /* 扩大容器宽度 */
+  min-width: 1600px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 32px; /* 增加左右padding */
   height: 80px; /* 增加高度 */
-  min-width: 1400px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .logo-section {
