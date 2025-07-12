@@ -3,16 +3,41 @@
 
     <!-- 用户基本信息 -->
     <div class="user-basic-info">
-      <h2>{{ userInfo.name }}</h2>
-      <p>年龄: {{ userInfo.age }}</p>
-      <p>学习时长: {{ userInfo.studyHours }}小时</p>
+      <div class="user-header">
+        <h2>{{ userInfo.name }}</h2>
+        <div class="user-stats">
+          <span>年龄: {{ userInfo.age }}</span>
+          <span>学习时长: {{ userInfo.studyHours }}小时</span>
+        </div>
+      </div>
     </div>
 
     <!-- 热力图 -->
     <div class="heatmap-container">
       <h3>学习热力图</h3>
       <div class="heatmap-content">
-        <!-- 这里放置热力图内容 -->
+        <div class="heatmap-wrapper">
+          <div class="heatmap-header">
+            <span class="heatmap-title">最近30天学习记录</span>
+            <div class="heatmap-legend">
+              <span>少</span>
+              <div class="legend-colors">
+                <div class="legend-item" v-for="(color, index) in legendColors" :key="index" :style="{ backgroundColor: color }"></div>
+              </div>
+              <span>多</span>
+            </div>
+          </div>
+          <div class="heatmap-grid">
+            <div 
+              v-for="(day, index) in heatmapData" 
+              :key="index"
+              class="heatmap-day"
+              :class="getHeatmapClass(day.count)"
+              :style="{ backgroundColor: getHeatmapColor(day.count) }"
+              :title="`${day.date}: ${day.count} 题`"
+            ></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -33,7 +58,7 @@
       </div>
 
       <div class="ability-evaluation">
-        <h3>整体评价</h3>
+        <h3>整体评价与学习建议</h3>
         <p>{{ evaluationText }}</p>
       </div>
     </div>
@@ -80,6 +105,50 @@ onMounted(() => {
 });
 
 const evaluationText = ref('该学员在代码规范方面表现优秀，逻辑思维和空间想象能力较强，创造力和问题解决能力有待进一步提升。');
+
+// 热力图相关数据和方法
+const legendColors = ref(['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']);
+
+// 生成最近30天的学习数据
+const generateHeatmapData = () => {
+  const data = [];
+  const today = new Date();
+  
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    
+    // 模拟数据：随机生成0-10的题目数量
+    const count = Math.floor(Math.random() * 11);
+    
+    data.push({
+      date: date.toISOString().split('T')[0],
+      count: count
+    });
+  }
+  
+  return data;
+};
+
+const heatmapData = ref(generateHeatmapData());
+
+// 根据题目数量获取颜色
+const getHeatmapColor = (count: number) => {
+  if (count === 0) return '#ebedf0';
+  if (count <= 2) return '#9be9a8';
+  if (count <= 4) return '#40c463';
+  if (count <= 6) return '#30a14e';
+  return '#216e39';
+};
+
+// 根据题目数量获取CSS类名
+const getHeatmapClass = (count: number) => {
+  if (count === 0) return 'heatmap-empty';
+  if (count <= 2) return 'heatmap-low';
+  if (count <= 4) return 'heatmap-medium';
+  if (count <= 6) return 'heatmap-high';
+  return 'heatmap-very-high';
+};
 </script>
 
 <style scoped>
@@ -119,6 +188,19 @@ p {
   padding: 20px;
   background: #f5f7fa;
   border-radius: 8px;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-stats {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #666;
 }
 
 .heatmap-container {
@@ -178,5 +260,107 @@ p {
   padding: 20px;
   background: #f5f7fa;
   border-radius: 8px;
+}
+
+/* 热力图样式 */
+.heatmap-wrapper {
+  width: 100%;
+}
+
+.heatmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.heatmap-title {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #666;
+}
+
+.legend-colors {
+  display: flex;
+  gap: 2px;
+}
+
+.legend-item {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+  padding: 15px;
+}
+
+.heatmap-day {
+  width: 100%;
+  height: 35px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-width: 0;
+}
+
+.heatmap-day:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.heatmap-empty {
+  background-color: #ebedf0;
+}
+
+.heatmap-low {
+  background-color: #9be9a8;
+}
+
+.heatmap-medium {
+  background-color: #40c463;
+}
+
+.heatmap-high {
+  background-color: #30a14e;
+}
+
+.heatmap-very-high {
+  background-color: #216e39;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .heatmap-grid {
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 4px;
+    padding: 10px;
+  }
+  
+  .heatmap-day {
+    height: 25px;
+  }
+  
+  .heatmap-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
 </style>
