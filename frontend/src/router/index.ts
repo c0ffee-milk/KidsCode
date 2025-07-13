@@ -12,10 +12,7 @@ const routes = [
   { path: '/learn/python', name: 'LearnPython', component: () => import('@/views/learn/PythonView.vue') },
   { path: '/learn/web', name: 'LearnWeb', component: () => import('@/views/learn/WebView.vue') },
   { path: '/learn/game', name: 'LearnGame', component: () => import('@/views/learn/GameView.vue') },
-  // 练习中心
-  { path: '/practice/coding', name: 'PracticeCoding', component: () => import('@/views/practice/CodingView.vue') },
-  { path: '/practice/challenge', name: 'PracticeChallenge', component: () => import('@/views/practice/ChallengeView.vue') },
-  { path: '/practice/project', name: 'PracticeProject', component: () => import('@/views/practice/ProjectView.vue') },
+ 
   // 社区
   { path: '/community/share', name: 'CommunityShare', component: () => import('@/views/community/Share.vue') },
   { path: '/community/forum', name: 'CommunityForum', component: () => import('@/views/community/Forum.vue') },
