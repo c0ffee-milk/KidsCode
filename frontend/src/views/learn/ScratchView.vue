@@ -18,7 +18,7 @@
         </div>
         <!-- 新增引导提示 -->
         <div class="guide-tip">
-          请拖拽“画笔”积木到编程区，然后点击右侧“运行”按钮，看看舞台会发生什么！
+          {{ blockTip }}
         </div>
         <div ref="blocklyDiv" class="scratch-blocks-div"></div>
         <!-- 在Blockly区 guide-tip 下方添加 -->
@@ -72,7 +72,10 @@
 declare global {
   interface Window {
     Blockly: any
-    drawArc: any
+    drawArc: (radius: number, start: number, end: number, color: string, width: number) => void
+    spriteMove: (dx: number, dy: number) => Promise<any>
+    spriteTurn: (angle: number) => Promise<any>
+    moveTo: (x: number, y: number) => void
   }
 }
 import { ref, onMounted, nextTick } from 'vue'
@@ -95,7 +98,9 @@ const isWhiteBg = ref(false)
 const blocklyDiv = ref<HTMLDivElement | null>(null)
 const stageCanvas = ref<HTMLCanvasElement | null>(null)
 let workspace: any = null
-
+declare interface Window {
+  spriteMove: any; 
+}
 // 自定义画弧线积木
 function defineCustomBlocks() {
   // @ts-ignore
@@ -150,6 +155,46 @@ function defineCustomBlocks() {
       return `moveTo(${x}, ${y});\n`
     }
   }
+  // 角色移动动画
+  if (window.Blockly && !window.Blockly.Blocks['sprite_move']) {
+    window.Blockly.Blocks['sprite_move'] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("角色移动 x")
+          .appendField(new window.Blockly.FieldNumber(0, -240, 240), "DX")
+          .appendField("y")
+          .appendField(new window.Blockly.FieldNumber(0, -180, 180), "DY");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#FFAB19");
+        this.setTooltip("让角色移动到新位置（动画）");
+      }
+    }
+    window.Blockly.JavaScript['sprite_move'] = function (block: any) {
+      const dx = block.getFieldValue('DX')
+      const dy = block.getFieldValue('DY')
+      return `await spriteMove(${dx}, ${dy});\n`
+    }
+  }
+  // 角色旋转动画
+  if (window.Blockly && !window.Blockly.Blocks['sprite_turn']) {
+    window.Blockly.Blocks['sprite_turn'] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("角色旋转")
+          .appendField(new window.Blockly.FieldNumber(0, -360, 360), "ANGLE")
+          .appendField("度");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#FFAB19");
+        this.setTooltip("让角色旋转指定角度（动画）");
+      }
+    }
+    window.Blockly.JavaScript['sprite_turn'] = function (block: any) {
+      const angle = block.getFieldValue('ANGLE')
+      return `await spriteTurn(${angle});\n`
+    }
+  }
 }
 
 onMounted(() => {
@@ -160,6 +205,26 @@ onMounted(() => {
     }, 500)
   })
 })
+
+const blockTip = ref('请拖拽“画笔”积木到编程区，然后点击右侧“运行”按钮，看看舞台会发生什么！')
+
+// 监听积木变化，动态提示
+function setupBlocklyEvents() {
+  if (workspace) {
+    workspace.addChangeListener((event: any) => {
+      if (event.type === 'create' || event.type === 'move') {
+        const blocks = workspace.getAllBlocks();
+        if (blocks.some((b: any) => b.type === 'pen_arc')) {
+          blockTip.value = '你已添加“画弧线”积木，可以设置半径和颜色绘制彩虹！'
+        } else if (blocks.some((b: any) => b.type === 'pen_moveto')) {
+          blockTip.value = '你已添加“移动画笔”积木，可以设置起点位置！'
+        } else {
+          blockTip.value = '请拖拽“画笔”积木到编程区，然后点击右侧“运行”按钮，看看舞台会发生什么！'
+        }
+      }
+    })
+  }
+}
 
 function initBlockly() {
   if (blocklyDiv.value && window.Blockly) {
@@ -183,12 +248,17 @@ function initBlockly() {
               <block type="math_number"></block>
               <block type="math_arithmetic"></block>
             </category>
+            <category name="动画" colour="#FFAB19">
+              <block type="sprite_move"></block>
+              <block type="sprite_turn"></block>
+            </category>
           </xml>
         `,
         trashcan: true,
         zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2 },
         grid: { spacing: 20, length: 3, colour: '#ccc', snap: true }
       })
+      setupBlocklyEvents() // 新增监听
       console.log('Blockly 初始化成功')
     } catch (error) {
       console.error('Blockly 初始化失败:', error)
@@ -200,12 +270,51 @@ function initBlockly() {
 
 const showFeedback = ref(false)
 
-function runCode() {
+// 动画函数
+async function spriteMove(dx: number, dy: number) {
+  return new Promise(resolve => {
+    let steps = 20
+    let stepX = dx / steps
+    let stepY = dy / steps
+    let count = 0
+    function animate() {
+      spriteX.value += stepX
+      spriteY.value += stepY
+      count++
+      if (count < steps) {
+        setTimeout(animate, 20)
+      } else {
+        resolve(true)
+      }
+    }
+    animate()
+  })
+}
+
+async function spriteTurn(angle: number) {
+  return new Promise(resolve => {
+    let steps = 20
+    let stepA = angle / steps
+    let count = 0
+    function animate() {
+      spriteDir.value += stepA
+      count++
+      if (count < steps) {
+        setTimeout(animate, 20)
+      } else {
+        resolve(true)
+      }
+    }
+    animate()
+  })
+}
+
+// 修改 runCode 支持 async/await
+async function runCode() {
   if (workspace && stageCanvas.value) {
     const ctx = stageCanvas.value.getContext('2d')
     if (!ctx) return
     ctx.clearRect(0, 0, stageCanvas.value.width, stageCanvas.value.height)
-    // 定义画弧线函数
     let centerX = 240
     let centerY = 180
     window.moveTo = function (x: number, y: number) {
@@ -221,17 +330,17 @@ function runCode() {
       ctx.stroke()
       ctx.restore()
     }
+    (window as any).spriteMove = (dx: number, dy: number) => spriteMove(dx, dy)
+    (window as any).spriteTurn = spriteTurn
+    
     const code = window.Blockly.JavaScript.workspaceToCode(workspace)
-    //若用户不写相关代码 提示用户
-    if(!code.includes('drawArc')&&!code.includes('moveTo')) {
-      alert('请拖拽画笔积木到编程区，并编写相关代码！')
+    if(!code.includes('drawArc')&&!code.includes('moveTo')&&!code.includes('spriteMove')&&!code.includes('spriteTurn')) {
+      alert('请拖拽画笔或动画积木到编程区，并编写相关代码！')
       return
     }
-
     try {
       // eslint-disable-next-line no-eval
-      eval(code)
-      // 运行成功后显示反馈
+      await eval(`(async()=>{${code}})()`)
       showFeedback.value = true
       setTimeout(() => {
         showFeedback.value = false
