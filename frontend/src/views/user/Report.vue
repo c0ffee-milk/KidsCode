@@ -67,7 +67,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
 import * as echarts from 'echarts';
+import { aiService } from '@/services/ai';
+import { authService } from '@/services/auth';
 
 const userInfo = ref({
   name: '编程小能手',
@@ -80,8 +83,50 @@ const totalCourses = ref(20);
 const progressPercentage = ref((completedCourses.value / totalCourses.value) * 100);
 
 const radarChart = ref<HTMLElement | null>(null);
+const evaluationText = ref('正在加载评估数据...');
+const abilityScores = ref([0, 0, 0, 0, 0]); // 默认分数
+const isLoading = ref(true);
 
-onMounted(() => {
+// 加载用户信息
+const loadUserInfo = async () => {
+  try {
+    const userData = await authService.getSelfInfo();
+    userInfo.value.name = userData.name;
+  } catch (error) {
+    console.error('加载用户信息失败:', error);
+  }
+};
+
+// 加载AI评估数据
+const loadAIEvaluation = async () => {
+  try {
+    isLoading.value = true;
+    const response = await aiService.aiEvaluate();
+    
+    if (response.respond && response.respond.score) {
+      const scores = response.respond.score;
+      abilityScores.value = [
+        scores.逻辑思维,
+        scores.创造力,
+        scores.问题解决,
+        scores.代码规范,
+        scores.空间想象
+      ];
+      evaluationText.value = response.respond.comment;
+    }
+  } catch (error: any) {
+    console.error('加载AI评估失败:', error);
+    ElMessage.error('加载评估数据失败，请稍后重试');
+    // 使用默认数据
+    abilityScores.value = [85, 72, 68, 90, 76];
+    evaluationText.value = '该学员在代码规范方面表现优秀，逻辑思维和空间想象能力较强，创造力和问题解决能力有待进一步提升。';
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 初始化雷达图
+const initRadarChart = () => {
   if (radarChart.value) {
     const chart = echarts.init(radarChart.value);
     const option = {
@@ -97,14 +142,17 @@ onMounted(() => {
       },
       series: [{
         type: 'radar',
-        data: [{ value: [85, 72, 68, 90, 76], name: '能力评估' }]
+        data: [{ value: abilityScores.value, name: '能力评估' }]
       }]
     };
     chart.setOption(option);
+    
+    // 监听窗口大小变化，重新调整图表大小
+    window.addEventListener('resize', () => {
+      chart.resize();
+    });
   }
-});
-
-const evaluationText = ref('该学员在代码规范方面表现优秀，逻辑思维和空间想象能力较强，创造力和问题解决能力有待进一步提升。');
+};
 
 // 热力图相关数据和方法
 const legendColors = ref(['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']);
@@ -131,6 +179,22 @@ const generateHeatmapData = () => {
 };
 
 const heatmapData = ref(generateHeatmapData());
+
+// 生命周期钩子
+onMounted(async () => {
+  try {
+    // 并行加载用户信息和AI评估数据
+    await Promise.all([
+      loadUserInfo(),
+      loadAIEvaluation()
+    ]);
+    
+    // 初始化雷达图
+    initRadarChart();
+  } catch (error) {
+    console.error('页面初始化失败:', error);
+  }
+});
 
 // 根据题目数量获取颜色
 const getHeatmapColor = (count: number) => {

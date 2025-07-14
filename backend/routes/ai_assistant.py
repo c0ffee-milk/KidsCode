@@ -4,7 +4,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from model import User, Record
 from config import Config
 import logging
-from backend.utils.ai_service import AIService
+from utils.ai_service import AIService
 
 ai_bp = Blueprint('ai', __name__)
 
@@ -41,9 +41,15 @@ def ai_analyze():
         if(respond == False):
             return jsonify(error='AI服务获取失败'), 500
         
+        try:
+            import json
+            respond_data = json.loads(respond)
+        except json.JSONDecodeError:
+            return jsonify(error='AI响应格式错误'), 500
+        
         return jsonify({
             'message': '获取成功',
-            'respond': respond
+            'respond': respond_data
         })
     
     except Exception as e:
@@ -87,9 +93,14 @@ def ai_judge():
         if(respond == False):
             return jsonify(error='AI服务获取失败'), 500
         
-        movement = respond['movement']
-        is_right = respond['is_right']
-        comment = respond['result']
+        try:
+            import json
+            respond_data = json.loads(respond)
+            movement = respond_data.get('movement', '')
+            is_right = respond_data.get('is_right', False)
+            comment = respond_data.get('comment', '')
+        except json.JSONDecodeError:
+            return jsonify(error='AI响应格式错误'), 500
 
         record = Record(
             user_id=user_id,
@@ -153,11 +164,19 @@ def ai_evaluate():
         if(respond == False):
             return jsonify(error='AI服务获取失败'), 500
         
+        try:
+            import json
+            respond_data = json.loads(respond)
+            score = respond_data.get('score', {})
+            comment = respond_data.get('comment', '')
+        except json.JSONDecodeError:
+            return jsonify(error='AI响应格式错误'), 500
+        
         return jsonify({
             'message': '获取成功',
             'respond': {
-                'score': respond['score'],
-                'comment': respond['comment']
+                'score': score,
+                'comment': comment
             }
         })
     

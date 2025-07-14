@@ -17,7 +17,7 @@ class AIService:
             else:
                 self.client = OpenAI(
                     api_key=api_key,
-                    api_url=api_url
+                    base_url=api_url
                 )
         except Exception as e:
             logging.error(f"初始化AI服务失败: {str(e)}")
@@ -68,7 +68,7 @@ class AIService:
                             用户答案：{content}
                         """
             
-            completion = OpenAI.client.chat.completions.create(
+            completion = self.client.chat.completions.create(
                 model="qwen-turbo",
                 messages=[
                     {"role": "system", "content": system_prompt},
@@ -78,9 +78,10 @@ class AIService:
                 max_tokens=1024,
             )
 
-            respond = completion.choices[0].message.content.strip()
-
-            return respond
+            respond = completion.choices[0].message.content
+            if respond:
+                return respond.strip()
+            return False
         
         except Exception as e:
             logging.error(f"AI服务调用错误: {str(e)}")
@@ -153,7 +154,7 @@ class AIService:
                             用户答案：{content}
                         """
             
-            completion = OpenAI.client.chat.completions.create(
+            completion = self.client.chat.completions.create(
                 model="qwen-turbo",
                 messages=[
                     {"role": "system", "content": system_prompt},
@@ -162,7 +163,10 @@ class AIService:
                 temperature=0.1,
                 max_tokens=1024,
             )
-            return completion.choices[0].message.content
+            respond = completion.choices[0].message.content
+            if respond:
+                return respond.strip()
+            return False
         
         except Exception as e:
             logging.error(f"AI服务调用错误: {str(e)}")
@@ -218,7 +222,7 @@ class AIService:
             user_prompt = f"""
                         做题记录{info}
                         """
-            completion = OpenAI.client.chat.completions.create(
+            completion = self.client.chat.completions.create(
                 model="qwen-turbo",
                 messages=[
                     {"role": "system", "content": system_prompt},
@@ -227,7 +231,10 @@ class AIService:
                 temperature=0.1,
                 max_tokens=1024,
             )
-            return completion.choices[0].message.content
+            respond = completion.choices[0].message.content
+            if respond:
+                return respond.strip()
+            return False
         
         except Exception as e:
             logging.error(f"AI服务调用错误: {str(e)}")
