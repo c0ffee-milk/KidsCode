@@ -49,7 +49,7 @@ class AIService:
                         请严格按照以下步骤进行：
                         1. 仔细分析题目和用户的回答（这部分无需输出）。
                         2. 判断用户的回答是否正确，并用 is_right 字段表示，值为 True 或 False。
-                        3. 如果回答正确，请对用户的解题思路和逻辑进行简要分析和鼓励，填写在 analysis 字段。
+                        3. 如果回答正确，直接回答“你的答案是正确的！”，填写在 analysis 字段。
                         4. 如果回答错误，请分析用户的解题思路，指出存在的问题，并给予循序渐进的指导和建议，但不要直接给出正确答案，填写在 analysis 字段。
 
                         输出格式：
@@ -97,7 +97,11 @@ class AIService:
         返回:
             成功:
                 message: success
-                is_right: True/False
+                respond: {
+                    'movement': 移动指令,
+                    'is_right': True/False,
+                    'comment': 评价
+                }
             失败:
                 error: 错误信息
         """
@@ -107,69 +111,40 @@ class AIService:
             
             # 构建提示词
             system_prompt = f"""
-                                你是一名专业的少儿编程教育老师。你的任务是根据题目内容，判断用户的回答是否正确。请你根据用户的回答进行推理，确认其答案是否能够完成题目要求。
-                                输出要求：
-                                1. 只返回 True 或 False，True 表示用户回答正确，False 表示用户回答错误。
-                                2. 不要输出任何多余的字符或解释说明。
-                            """
-            
-            user_prompt = f"""
-                            题目：{subject}
-                            用户答案：{content}
-                        """
-            
-            completion = OpenAI.client.chat.completions.create(
-                model="qwen-turbo",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                temperature=0.1,
-                max_tokens=1024,
-            )
-            return completion.choices[0].message.content
-        
-        except Exception as e:
-            logging.error(f"AI服务调用错误: {str(e)}")
-            return False
-        
-    def ai_translate(self, subject, content):
-        """
-        将用户的内容翻译为行动指令
-
-        Args:
-            subject: 题目
-            content: 回答内容
-
-        返回:
-            成功:
-                respond: {
-                    message: 获取成功
-                    movement: 行动指令
-                }
-            失败:
-                error: 错误信息   
-        """
-        try:
-            if not self.client:
-                return False
-            
-            # 构建提示词
-            system_prompt = f"""
-                                你是一名专业的少儿编程教育老师。你的任务是将用户输入的自然语言描述的逻辑，准确翻译为一串行动指令。
+                                你是一名专业的少儿编程教育老师。你的任务有两个：
+                                1. 将用户输入的自然语言描述的逻辑，准确翻译为一串行动指令。
                                 目前支持的指令如下：
-                                1. 向左前进一个单位（用数字1表示）
-                                2. 向右前进一个单位（用数字2表示）
-                                3. 向上前进一个单位（用数字3表示）
-                                4. 向下前进一个单位（用数字4表示）
-                                5. 无限循环（用数字5表示，括号内为需要循环的动作序列，例如：无限重复向左和向右为5(12)）
+                                - 向左前进一个单位（用数字1表示）
+                                - 向右前进一个单位（用数字2表示）
+                                - 向上前进一个单位（用数字3表示）
+                                - 向下前进一个单位（用数字4表示）
+                                - 无限循环（用数字5表示，括号内为需要循环的动作序列，例如：无限重复向左和向右为5(12)）
                                 请注意：
-                                1. 用户输入中可能包含循环、跳转、判断等逻辑。请根据题目和用户输入，逐步推理每一步的行动。
-                                2. 忽略地图的边界和障碍物（即使右边是障碍物，也可以输出向右的动作指令）。
-                                3. 只需输出行动指令序列，不要输出多余内容。
-                                请将用户输入的逻辑转换为如下 JSON 格式：
+                                - 用户输入中可能包含循环、跳转、判断等逻辑。请根据题目和用户输入，逐步推理每一步的行动。
+                                - 忽略地图的边界和障碍物（即使右边是障碍物，也可以输出向右的动作指令）。
+                                - 只需输出行动指令序列，不要输出多余内容。
+                                将结果填写在movement字段
+
+                                2. 根据题目内容，判断用户的回答是否正确。请你根据用户的回答进行推理，确认其答案是否能够完成题目要求。
+                                输出要求：
+                                - 只返回 True 或 False，True 表示用户回答正确，False 表示用户回答错误。
+                                - 不要输出任何多余的字符或解释说明。
+                                将结果填写在is_right字段
+
+                                3. 根据题目和用户的作答内容，给出针对性的评价和建议。
+                                请注意：
+                                - 评价要结合题目要求和用户的实际回答，既要肯定优点，也要指出可以改进的地方。
+                                - 评价内容要简明、具体，适合8-14岁青少年理解，语言要鼓励、积极，帮助他们提升编程能力。
+                                - 如有需要，可适当给出学习建议，但不要直接给出标准答案。
+                                - 只输出评价内容，不要输出多余的解释或格式。
+                                - 只用一段话评价，不超过150字，纯文本格式
+                                将结果填写在comment字段。
+
+                                严格按照以下JSON格式输出：
                                 {
-                                    "movement": "..."  // 由1、2、3、4、5组成的数字序列
+                                    'movement': 行动指令序列, // 由1、2、3、4、5组成的数字序列
+                                    'is_right': True/False,
+                                    'comment': 评价
                                 }
                             """
             
@@ -177,6 +152,7 @@ class AIService:
                             题目：{subject}
                             用户答案：{content}
                         """
+            
             completion = OpenAI.client.chat.completions.create(
                 model="qwen-turbo",
                 messages=[
@@ -256,62 +232,3 @@ class AIService:
         except Exception as e:
             logging.error(f"AI服务调用错误: {str(e)}")
             return False
-
-    def ai_comment(self, subject, content):
-        """
-        根据题目和用户输入，给出评价
-
-        Args:
-            subject: 题目
-            content: 用户输入
-
-        返回:
-            成功:
-                respond: {
-                    message: 获取成功,
-                    comment: 评价
-                }
-            失败:
-                error: 错误信息   
-        """
-        try:
-            if not self.client:
-                return False
-            
-            # 构建提示词
-            system_prompt = f"""
-                                你是一名专业的少儿编程教育老师。你的任务是根据题目和用户的作答内容，给出针对性的评价和建议。
-
-                                请注意：
-                                - 评价要结合题目要求和用户的实际回答，既要肯定优点，也要指出可以改进的地方。
-                                - 评价内容要简明、具体，适合8-14岁青少年理解，语言要鼓励、积极，帮助他们提升编程能力。
-                                - 如有需要，可适当给出学习建议，但不要直接给出标准答案。
-                                - 只输出评价内容，不要输出多余的解释或格式。
-                                - 只用一段话评价，不超过150字，纯文本格式
-                                严格按照以下JSON格式输出：
-                                {
-                                    "comment": "..."  // 以纯文本格式输出
-                                }
-                            """
-        
-            user_prompt = f"""
-                            题目：{subject}
-                            用户答案：{content}
-                        """
-            completion = OpenAI.client.chat.completions.create(
-                model="qwen-turbo",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                temperature=0.1,
-                max_tokens=1024,
-            )
-            return completion.choices[0].message.content
-        
-        except Exception as e:
-            logging.error(f"AI服务调用错误: {str(e)}")
-            return False
-            
-
-

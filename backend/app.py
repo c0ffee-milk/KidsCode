@@ -51,8 +51,10 @@ def create_app():
     # 注册蓝图
     # 创建蓝图并设置前缀
     from routes.auth import auth_bp
+    from routes.ai_assistant import ai_assistant_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(ai_assistant_bp, url_prefix='/api/ai-assistant')
 
 
     # 错误处理
