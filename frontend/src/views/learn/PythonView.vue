@@ -7,6 +7,9 @@
     <div class="python-content">
       <!-- 左侧 Blockly 拖拽区 -->
       <div class="python-blocks-panel">
+        <div v-if="loadingBlockly" class="blockly-loading">
+          <span>正在加载编程区，请稍候...</span>
+        </div>
         <div class="blocks-header">
           <span>编程区</span>
           <button @click="initBlockly" class="init-btn">重新初始化</button>
@@ -72,6 +75,9 @@ let workspace = null
 const showFeedback = ref(false)
 const showIntro = ref(true)
 const blockTip = ref('请拖拽"while循环"和"移动一步"积木到编程区，然后点击右侧"运行"按钮。')
+const loadingBlockly = ref(true)
+let blocklyRetryCount = 0
+const MAX_BLOCKLY_RETRY = 10
 
 function cellSymbol(cell, idx) {
   if (idx === knightPos.value) return '🏇'
@@ -225,12 +231,24 @@ function initBlockly() {
         grid: { spacing: 20, length: 3, colour: '#ccc', snap: true }
       })
       console.log('Blockly 初始化成功:', workspace)
+      loadingBlockly.value = false
+      blocklyRetryCount = 0
     } catch (error) {
       console.error('Blockly 初始化失败:', error)
+      blocklyRetryCount++
+      if (blocklyRetryCount < MAX_BLOCKLY_RETRY) {
+        setTimeout(() => { initBlockly() }, 500)
+      } else {
+        alert('Blockly 初始化多次失败，请刷新页面重试。')
+      }
     }
   } else {
-    console.log('重试初始化...')
-    setTimeout(() => { initBlockly() }, 500)
+    blocklyRetryCount++
+    if (blocklyRetryCount < MAX_BLOCKLY_RETRY) {
+      setTimeout(() => { initBlockly() }, 500)
+    } else {
+      alert('Blockly 初始化多次失败，请刷新页面重试。')
+    }
   }
 }
 
@@ -866,5 +884,18 @@ async function runCode() {
 .intro-confirm:hover {
   background: linear-gradient(45deg, #667eea, #4c97ff);
   transform: translateY(-2px) scale(1.04);
+}
+.blockly-loading {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: rgba(255,255,255,0.85);
+  text-align: center;
+  padding: 40px 0;
+  font-size: 20px;
+  color: #4c97ff;
+  border-radius: 0 0 20px 20px;
 }
 </style>
