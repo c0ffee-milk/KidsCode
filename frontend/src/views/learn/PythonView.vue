@@ -83,15 +83,24 @@ function cellSymbol(cell, idx) {
     default: return '⬜'
   }
 }
-function cellClass(cell) {
+
+function cellClass(cell, idx) {
+  let baseClass = ''
   switch(cell) {
-    case 1: return 'start'
-    case 2: return 'end'
-    case -1: return 'obstacle1'
-    case -4: return 'unreachable'
-    case -2: return 'fog'
-    default: return 'empty'
+    case 1: baseClass = 'start'; break;
+    case 2: baseClass = 'end'; break;
+    case -1: baseClass = 'obstacle1'; break;
+    case -4: baseClass = 'unreachable'; break;
+    case -2: baseClass = 'fog'; break;
+    default: baseClass = 'empty';
   }
+  
+  // 如果是骑士当前位置，添加特殊样式
+  if (idx === knightPos.value) {
+    baseClass += ' knight-position'
+  }
+  
+  return baseClass
 }
 
 function defineCustomBlocks() {
@@ -530,23 +539,57 @@ async function runCode() {
 }
 
 .map-row span {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4em;
-  border-radius: 8px;
-  border: 2px solid #ddd;
+  font-size: 1.6em;
+  border-radius: 12px;
+  border: 3px solid #ddd;
   background: #fff;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .map-row span:hover {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
   z-index: 10;
+}
+
+/* 骑士动画效果 */
+.map-row span:has-text('🏇') {
+  animation: knight-bounce 1s ease-in-out infinite alternate;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-color: #2196f3;
+  box-shadow: 
+    0 4px 20px rgba(33, 150, 243, 0.4),
+    0 0 20px rgba(33, 150, 243, 0.2);
+  transform: scale(1.1);
+}
+
+/* 使用CSS选择器来匹配包含骑士emoji的元素 */
+.map-row span[style*="🏇"] {
+  animation: knight-bounce 1s ease-in-out infinite alternate;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-color: #2196f3;
+  box-shadow: 
+    0 4px 20px rgba(33, 150, 243, 0.4),
+    0 0 20px rgba(33, 150, 243, 0.2);
+  transform: scale(1.1);
+}
+
+@keyframes knight-bounce {
+  0% { 
+    transform: scale(1.1) translateY(0px); 
+    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+  }
+  100% { 
+    transform: scale(1.15) translateY(-3px); 
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.6);
+  }
 }
 
 .start { 
@@ -559,158 +602,269 @@ async function runCode() {
   background: linear-gradient(135deg, #ffe082, #ffd54f);
   border-color: #ffca28;
   box-shadow: 0 4px 15px rgba(255, 202, 40, 0.3);
-  animation: glow 2s infinite alternate;
+  animation: end-glow 2s infinite alternate;
 }
 
-@keyframes glow {
-  from { box-shadow: 0 4px 15px rgba(255, 202, 40, 0.3); }
-  to { box-shadow: 0 4px 25px rgba(255, 202, 40, 0.6); }
+@keyframes end-glow {
+  0% { 
+    box-shadow: 0 4px 15px rgba(255, 202, 40, 0.3);
+    transform: scale(1);
+  }
+  100% { 
+    box-shadow: 0 4px 30px rgba(255, 202, 40, 0.8);
+    transform: scale(1.05);
+  }
 }
 
 .empty { 
   background: linear-gradient(135deg, #fff, #f8fafc);
   border-color: #e2e8f0;
+  transition: all 0.3s ease;
 }
 
+.empty:hover {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-color: #0ea5e9;
+}
+
+/* 地图描述区域美化 */
 .map-desc {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   font-size: 14px;
   color: #666;
   justify-content: center;
   flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .map-desc span {
-  background: rgba(255, 255, 255, 0.8);
-  padding: 6px 12px;
-  border-radius: 15px;
-  border: 1px solid rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 2px solid rgba(76, 151, 255, 0.2);
   font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
+.map-desc span:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(76, 151, 255, 0.3);
+  border-color: rgba(76, 151, 255, 0.4);
+}
+
+.map-desc span.start {
+  border-color: #4fc3f7;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+}
+
+.map-desc span.end {
+  border-color: #ffca28;
+  background: linear-gradient(135deg, #fff3e0, #ffe082);
+}
+
+.map-desc span.empty {
+  border-color: #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+}
+
+/* 添加闪烁效果给特殊元素 */
+.map-row span:nth-child(1) {
+  animation: start-pulse 3s ease-in-out infinite;
+}
+
+@keyframes start-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* 为地图整体添加一些装饰 */
+.stage-area::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: linear-gradient(45deg, #4c97ff, #667eea, #764ba2, #ff6b6b);
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0.1;
+  animation: rotate-border 4s linear infinite;
+}
+
+@keyframes rotate-border {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 运行反馈优化 */
 .run-feedback {
   margin: 20px auto 0;
-  background: linear-gradient(135deg, #e6fffb, #b2dfdb);
-  color: #00695c;
-  border: 2px solid #4db6ac;
-  border-radius: 20px;
-  padding: 16px 24px;
-  font-size: 18px;
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  color: #2e7d32;
+  border: 3px solid #4caf50;
+  border-radius: 25px;
+  padding: 20px 30px;
+  font-size: 20px;
   text-align: center;
   width: fit-content;
   font-weight: bold;
-  box-shadow: 0 4px 20px rgba(77, 182, 172, 0.3);
-  animation: success 0.6s ease-out;
+  box-shadow: 
+    0 8px 25px rgba(76, 175, 80, 0.3),
+    inset 0 2px 0 rgba(255,255,255,0.3);
+  animation: success-celebration 0.8s ease-out;
+  position: relative;
 }
 
-@keyframes success {
-  0% { transform: scale(0.8) translateY(20px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+.run-feedback::before {
+  content: '✨';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  animation: sparkle 1s ease-in-out infinite alternate;
+}
+
+.run-feedback::after {
+  content: '✨';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  animation: sparkle 1s ease-in-out infinite alternate 0.5s;
+}
+
+@keyframes success-celebration {
+  0% { 
+    transform: scale(0.8) translateY(20px) rotate(-5deg); 
+    opacity: 0; 
+  }
+  50% { 
+    transform: scale(1.1) translateY(-5px) rotate(2deg); 
+  }
+  100% { 
+    transform: scale(1) translateY(0) rotate(0deg); 
+    opacity: 1; 
+  }
+}
+
+@keyframes sparkle {
+  0% { 
+    transform: translateY(-50%) scale(1) rotate(0deg); 
+    opacity: 0.7; 
+  }
+  100% { 
+    transform: translateY(-50%) scale(1.2) rotate(10deg); 
+    opacity: 1; 
+  }
+}
+
+.knight-position {
+  animation: knight-bounce 1s ease-in-out infinite alternate !important;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
+  border-color: #2196f3 !important;
+  box-shadow: 
+    0 4px 20px rgba(33, 150, 243, 0.4),
+    0 0 20px rgba(33, 150, 243, 0.2) !important;
+  transform: scale(1.1) !important;
+  z-index: 5;
+}
+
+/* 骑士移动时的轨迹效果 */
+.knight-position::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 2px solid #2196f3;
+  border-radius: 12px;
+  opacity: 0.3;
+  animation: knight-trail 0.8s ease-out infinite;
+}
+
+@keyframes knight-trail {
+  0% { 
+    transform: scale(1); 
+    opacity: 0.5; 
+  }
+  100% { 
+    transform: scale(1.3); 
+    opacity: 0; 
+  }
 }
 
 .intro-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1000 !important;
 }
 
 .intro-content {
-  background: linear-gradient(135deg, #fff, #f8fafc);
-  padding: 32px;
-  border-radius: 20px;
-  text-align: center;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255,255,255,0.2);
-  border: 2px solid rgba(76, 151, 255, 0.2);
-  animation: slideUp 0.4s ease-out;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  background: #fff;
+  border-radius: 18px;
+  padding: 36px 40px 28px 40px;
+  min-width: 340px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 0 rgba(76,151,255,0.08);
+  color: #333;
+  text-align: left;
+  font-size: 18px;
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .intro-content h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-  color: #4c97ff;
+  font-size: 26px;
   font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  margin-bottom: 18px;
+  color: #4c97ff;
 }
 
 .intro-content h3 {
-  margin: 20px 0 12px 0;
-  font-size: 18px;
-  color: #667eea;
-  font-weight: bold;
+  font-size: 20px;
+  margin: 18px 0 8px 0;
+  color: #ffab19;
 }
 
 .intro-content ul {
-  text-align: left;
-  margin: 0 0 20px 0;
-  background: rgba(76, 151, 255, 0.05);
-  padding: 16px;
-  border-radius: 10px;
-  border-left: 4px solid #4c97ff;
+  margin: 0 0 10px 18px;
+  padding: 0;
 }
 
 .intro-content li {
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #555;
-  line-height: 1.5;
+  margin-bottom: 4px;
 }
 
 .intro-confirm {
+  margin-top: 18px;
   background: linear-gradient(45deg, #4c97ff, #667eea);
   color: #fff;
   border: none;
-  padding: 14px 28px;
-  border-radius: 30px;
+  border-radius: 22px;
+  padding: 10px 28px;
   font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(76, 151, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(76, 151, 255, 0.18);
+  transition: background 0.2s, transform 0.2s;
 }
-
 .intro-confirm:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 30px rgba(76, 151, 255, 0.4);
-  background: linear-gradient(45deg, #667eea, #764ba2);
-}
-
-/* 添加一些装饰性动画 */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-.python-blocks-panel {
-  animation: float 6s ease-in-out infinite;
-}
-
-.python-stage-panel {
-  animation: float 6s ease-in-out infinite 3s;
+  background: linear-gradient(45deg, #667eea, #4c97ff);
+  transform: translateY(-2px) scale(1.04);
 }
 </style>
