@@ -63,7 +63,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import * as Blockly from 'blockly'
-window.Blockly = Blockly
+import 'blockly/javascript'
 
 const mapData = ref([[1,0,0,0,0,0,0,0,0,2]])
 const knightPos = ref(0) // 骑士当前位置
@@ -71,7 +71,7 @@ const blocklyDiv = ref(null)
 let workspace = null
 const showFeedback = ref(false)
 const showIntro = ref(true)
-const blockTip = ref('请拖拽“while循环”和“移动一步”积木到编程区，然后点击右侧“运行”按钮。')
+const blockTip = ref('请拖拽"while循环"和"移动一步"积木到编程区，然后点击右侧"运行"按钮。')
 
 function cellSymbol(cell, idx) {
   if (idx === knightPos.value) return '🏇'
@@ -95,11 +95,9 @@ function cellClass(cell) {
 }
 
 function defineCustomBlocks() {
-  // 兼容性修复：确保 window.Blockly.JavaScript 已初始化
-  if (!window.Blockly.JavaScript) window.Blockly.JavaScript = {};
   // 单步前进
-  if (window.Blockly && !window.Blockly.Blocks['move_step']) {
-    window.Blockly.Blocks['move_step'] = {
+  if (!Blockly.Blocks['move_step']) {
+    Blockly.Blocks['move_step'] = {
       init: function () {
         this.appendDummyInput().appendField('骑士向前移动一步')
         this.setPreviousStatement(true, null)
@@ -108,17 +106,17 @@ function defineCustomBlocks() {
         this.setTooltip('骑士向前移动一格')
       }
     }
-    window.Blockly.JavaScript['move_step'] = function () {
+    Blockly.JavaScript['move_step'] = function () {
       return 'moveStep();\n'
     }
   }
   // 多步前进
-  if (window.Blockly && !window.Blockly.Blocks['move_steps']) {
-    window.Blockly.Blocks['move_steps'] = {
+  if (!Blockly.Blocks['move_steps']) {
+    Blockly.Blocks['move_steps'] = {
       init: function () {
         this.appendDummyInput()
           .appendField('骑士向前移动')
-          .appendField(new window.Blockly.FieldNumber(2, 1, 20), 'STEPS')
+          .appendField(new Blockly.FieldNumber(2, 1, 20), 'STEPS')
           .appendField('步')
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
@@ -126,28 +124,28 @@ function defineCustomBlocks() {
         this.setTooltip('骑士向前移动多步')
       }
     }
-    window.Blockly.JavaScript['move_steps'] = function (block) {
+    Blockly.JavaScript['move_steps'] = function (block) {
       const steps = block.getFieldValue('STEPS')
       return `moveSteps(${steps});\n`
     }
   }
   // while循环
-  if (window.Blockly && !window.Blockly.Blocks['while_not_end']) {
-    window.Blockly.Blocks['while_not_end'] = {
+  if (!Blockly.Blocks['while_not_end']) {
+    Blockly.Blocks['while_not_end'] = {
       init: function () {
         this.appendStatementInput('DO').appendField('重复执行直到到达终点')
         this.setColour('#FFAB19')
         this.setTooltip('while循环，直到骑士到达终点')
       }
     }
-    window.Blockly.JavaScript['while_not_end'] = function (block) {
-      var branch = window.Blockly.JavaScript.statementToCode(block, 'DO')
+    Blockly.JavaScript['while_not_end'] = function (block) {
+      var branch = Blockly.JavaScript.statementToCode(block, 'DO')
       return 'whileNotEnd(async () => {\n' + branch + '});\n'
     }
   }
   // 判断是否到终点
-  if (window.Blockly && !window.Blockly.Blocks['is_at_end']) {
-    window.Blockly.Blocks['is_at_end'] = {
+  if (!Blockly.Blocks['is_at_end']) {
+    Blockly.Blocks['is_at_end'] = {
       init: function () {
         this.appendDummyInput().appendField('是否到达终点?')
         this.setOutput(true, 'Boolean')
@@ -155,22 +153,22 @@ function defineCustomBlocks() {
         this.setTooltip('判断骑士是否到达终点')
       }
     }
-    window.Blockly.JavaScript['is_at_end'] = function () {
-      return ['isAtEnd()', window.Blockly.JavaScript.ORDER_NONE]
+    Blockly.JavaScript['is_at_end'] = function () {
+      return ['isAtEnd()', Blockly.JavaScript.ORDER_NONE]
     }
   }
   // 输出提示
-  if (window.Blockly && !window.Blockly.Blocks['show_tip']) {
-    window.Blockly.Blocks['show_tip'] = {
+  if (!Blockly.Blocks['show_tip']) {
+    Blockly.Blocks['show_tip'] = {
       init: function () {
-        this.appendDummyInput().appendField('输出提示').appendField(new window.Blockly.FieldTextInput('继续加油！'), 'TIP')
+        this.appendDummyInput().appendField('输出提示').appendField(new Blockly.FieldTextInput('继续加油！'), 'TIP')
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
         this.setColour('#8BC34A')
         this.setTooltip('在页面上输出提示')
       }
     }
-    window.Blockly.JavaScript['show_tip'] = function (block) {
+    Blockly.JavaScript['show_tip'] = function (block) {
       const tip = block.getFieldValue('TIP')
       return `showTip('${tip}');\n`
     }
@@ -187,11 +185,15 @@ onMounted(() => {
 })
 
 function initBlockly() {
-  if (blocklyDiv.value && window.Blockly) {
+  console.log('开始初始化 Blockly...')
+  console.log('blocklyDiv.value:', blocklyDiv.value)
+  console.log('Blockly:', Blockly)
+  
+  if (blocklyDiv.value && Blockly) {
     try {
-      defineCustomBlocks(); // 每次初始化前都注册自定义块，防止热重载丢失
+      defineCustomBlocks();
       if (workspace) workspace.dispose()
-      workspace = window.Blockly.inject(blocklyDiv.value, {
+      workspace = Blockly.inject(blocklyDiv.value, {
         toolbox: `
           <xml>
             <category name="循环" colour="#FFAB19">
@@ -213,10 +215,12 @@ function initBlockly() {
         zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 2, minScale: 0.5, scaleSpeed: 1.2 },
         grid: { spacing: 20, length: 3, colour: '#ccc', snap: true }
       })
+      console.log('Blockly 初始化成功:', workspace)
     } catch (error) {
       console.error('Blockly 初始化失败:', error)
     }
   } else {
+    console.log('重试初始化...')
     setTimeout(() => { initBlockly() }, 500)
   }
 }
@@ -247,20 +251,45 @@ window.showTip = function (tip) {
 }
 
 async function runCode() {
-  // 简化为无论Blockly如何，点击运行都让马动起来
   knightPos.value = 0
   showFeedback.value = false
-  // 动画演示骑士自动前进到终点
-  const steps = mapData.value[0].length - 1
-  for (let i = 0; i < steps; i++) {
-    await new Promise(r => setTimeout(r, 300))
-    knightPos.value++
+  
+  if (workspace) {
+    try {
+      const code = Blockly.JavaScript.workspaceToCode(workspace)
+      console.log('生成的代码:', code)
+      if (code.trim()) {
+        eval(code)
+      } else {
+        // 如果没有代码，默认演示
+        const steps = mapData.value[0].length - 1
+        for (let i = 0; i < steps; i++) {
+          await new Promise(r => setTimeout(r, 300))
+          knightPos.value++
+        }
+      }
+    } catch (error) {
+      console.error('代码执行出错:', error)
+      // 出错时也执行默认演示
+      const steps = mapData.value[0].length - 1
+      for (let i = 0; i < steps; i++) {
+        await new Promise(r => setTimeout(r, 300))
+        knightPos.value++
+      }
+    }
+  } else {
+    // 没有 workspace 时执行默认演示
+    const steps = mapData.value[0].length - 1
+    for (let i = 0; i < steps; i++) {
+      await new Promise(r => setTimeout(r, 300))
+      knightPos.value++
+    }
   }
+  
   showFeedback.value = true
   setTimeout(() => { showFeedback.value = false }, 2000)
 }
 </script>
-
 
 <style scoped>
 .python-main {
@@ -452,6 +481,32 @@ async function runCode() {
   cursor: pointer;
 }
 .intro-confirm:hover {
+  background: #3d82e6;
+}
+
+/* 添加缺失的样式 */
+.blocks-header {
+  padding: 12px 20px;
+  font-weight: bold;
+  color: #4c97ff;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+}
+
+.init-btn {
+  background: #4c97ff;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.init-btn:hover {
   background: #3d82e6;
 }
 </style>
