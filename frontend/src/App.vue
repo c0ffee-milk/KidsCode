@@ -130,25 +130,48 @@
       <!-- 可根据需要美化 -->
     </svg>
   </div>
-  <div v-if="showAI" class="ai-assistant-modal">
-    <div class="ai-assistant-header">
-      <span>AI助手</span>
-      <button @click="showAI = false">关闭</button>
-    </div>
-    <div class="ai-assistant-body">
-      <div class="ai-assistant-history">
-        <div v-for="(msg, i) in aiHistory" :key="i" :class="msg.role">{{ msg.text }}</div>
+  <!-- AI助手聊天框 -->
+  <div v-if="showAI" class="ai-chat-overlay">
+    <div class="ai-chat-container">
+      <div class="ai-chat-header">
+        <span>🤖 AI编程助手</span>
+        <button @click="showAI = false" class="ai-close-btn">×</button>
       </div>
-      <input v-model="aiInput" @keyup.enter="sendAI" placeholder="请输入你的问题..." />
-      <button @click="sendAI">发送</button>
+      <div class="ai-chat-history" ref="chatHistory">
+        <div v-for="(msg, index) in aiHistory" :key="index" :class="['ai-message', msg.role]">
+          <div class="message-content">{{ msg.text }}</div>
+          <div v-if="msg.timestamp" class="message-time">{{ msg.timestamp }}</div>
+        </div>
+      </div>
+      <div class="ai-chat-input-area">
+        <!-- 新增代码分析按钮 -->
+        <button @click="triggerCodeAnalysis" class="ai-analysis-btn" title="分析当前关卡常见错误">
+          🤖 代码分析
+        </button>
+        <div class="ai-input-group">
+          <input 
+            v-model="aiInput" 
+            @keyup.enter="sendAIMessage" 
+            placeholder="输入你的问题..."
+            class="ai-input"
+          />
+          <button @click="sendAIMessage" class="ai-send-btn">发送</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, provide } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+
+declare global {
+  interface Window {
+    showCurrentLevelErrors?: () => void
+  }
+}
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -160,9 +183,12 @@ const handleLogout = () => {
 
 const showAI = ref(false)
 const aiInput = ref('')
-const aiHistory = ref([{ role: 'ai', text: '你好，我是AI助手，有什么可以帮你？' }])
+type AIMessage = { role: string; text: string; timestamp?: string }
+const aiHistory = ref<AIMessage[]>([
+  { role: 'ai', text: '你好！我是AI编程助手🤖，点击各关卡的"代码分析"按钮，我会为你分析常见错误和解决方案！' }
+])
 
-function sendAI() {
+function sendAIMessage() {
   if (!aiInput.value.trim()) return
   aiHistory.value.push({ role: 'user', text: aiInput.value })
   // 这里仅做前端模拟回复
@@ -171,6 +197,28 @@ function sendAI() {
   }, 600)
   aiInput.value = ''
 }
+
+// 触发代码分析的方法
+function triggerCodeAnalysis() {
+  // 调用全局方法来显示当前关卡错误
+  if (window.showCurrentLevelErrors) {
+    window.showCurrentLevelErrors()
+  } else {
+    showAIError('请先进入编程闯关页面才能使用代码分析功能！')
+  }
+}
+
+function showAIError(msg: string) {
+  aiHistory.value.push({ 
+    role: 'ai', 
+    text: msg,
+    timestamp: new Date().toLocaleTimeString()
+  })
+  showAI.value = true
+}
+
+// 提供给子组件使用
+provide('showAIError', showAIError)
 </script>
 
 <style>
@@ -461,139 +509,173 @@ body {
 .ai-assistant-fab:hover {
   box-shadow: 0 4px 16px #7a6fff33;
 }
-.ai-assistant-modal {
+.ai-chat-overlay {
   position: fixed;
-  right: 32px;
-  bottom: 100px;
-  width: 340px;
-  background: linear-gradient(135deg, #f9e7fe 0%, #e0e7ff 100%);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px #7a6fff33, 0 2px 8px #fff8;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
   z-index: 10000;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-chat-container {
+  background: #fff;
+  border-radius: 16px;
   overflow: hidden;
-  border: 2px solid #e0e7ff;
-  animation: ai-pop-in 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: slide-in 0.4s ease-out;
 }
 
-@keyframes ai-pop-in {
-  0% { transform: scale(0.8) translateY(40px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+@keyframes slide-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.ai-assistant-header {
+.ai-chat-header {
+  background: linear-gradient(90deg, #7a6fff 0%, #67e8ff 100%);
+  color: #fff;
+  padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 20px;
-  background: linear-gradient(90deg, #7a6fff 0%, #67e8ff 100%);
-  color: #fff;
   font-weight: bold;
   font-size: 18px;
-  border-bottom: 1.5px solid #e0e7ff;
-  letter-spacing: 1px;
+  border-bottom: 2px solid #e0e7ff;
 }
 
-.ai-assistant-header button {
+.ai-close-btn {
   background: none;
   border: none;
   color: #fff;
-  font-size: 18px;
+  font-size: 22px;
   cursor: pointer;
-  padding: 4px 10px;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-.ai-assistant-header button:hover {
-  background: #fff3;
 }
 
-.ai-assistant-body {
-  padding: 16px 18px 14px 18px;
+.ai-chat-history {
+  padding: 16px 24px;
+  max-height: 300px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  background: transparent;
+  gap: 12px;
 }
 
-.ai-assistant-history {
-  min-height: 100px;
-  max-height: 220px;
-  overflow-y: auto;
-  margin-bottom: 10px;
+.ai-message {
+  padding: 10px 14px;
+  border-radius: 16px;
+  position: relative;
+  max-width: 80%;
+  word-break: break-word;
+}
+
+.ai-message.ai {
+  background: linear-gradient(90deg, #e0e7ff 0%, #f9e7fe 100%);
+  color: #7a6fff;
+  align-self: flex-start;
+}
+
+.ai-message.user {
+  background: linear-gradient(90deg, #67e8ff 0%, #7a6fff 100%);
+  color: #fff;
+  align-self: flex-end;
+}
+
+.message-content {
+  margin: 0;
+}
+
+.message-time {
+  font-size: 12px;
+  color: #a0aec0;
+  margin-top: 4px;
+  text-align: right;
+}
+
+.ai-chat-input-area {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-right: 2px;
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+  background: rgba(248, 250, 252, 0.8);
 }
 
-.ai-assistant-history .ai {
-  align-self: flex-start;
-  background: linear-gradient(90deg, #e0e7ff 0%, #f9e7fe 100%);
-  color: #7a6fff;
-  border-radius: 16px 16px 16px 4px;
-  padding: 8px 16px;
-  font-size: 15px;
-  box-shadow: 0 2px 8px #7a6fff11;
-  max-width: 80%;
-  word-break: break-all;
-  position: relative;
-}
-.ai-assistant-history .ai::before {
-  content: "🤖";
-  margin-right: 6px;
-}
-
-.ai-assistant-history .user {
-  align-self: flex-end;
-  background: linear-gradient(90deg, #67e8ff 0%, #7a6fff 100%);
-  color: #fff;
-  border-radius: 16px 16px 4px 16px;
-  padding: 8px 16px;
-  font-size: 15px;
-  box-shadow: 0 2px 8px #67e8ff22;
-  max-width: 80%;
-  word-break: break-all;
-  position: relative;
-}
-.ai-assistant-history .user::after {
-  content: "🧑";
-  margin-left: 6px;
-}
-
-.ai-assistant-body input {
-  border: 1.5px solid #e0e7ff;
-  border-radius: 16px;
-  padding: 10px 14px;
-  font-size: 15px;
-  outline: none;
-  transition: border 0.2s;
-  margin-bottom: 4px;
-  background: #fff;
-}
-.ai-assistant-body input:focus {
-  border: 1.5px solid #7a6fff;
-}
-
-.ai-assistant-body button {
-  align-self: flex-end;
-  background: linear-gradient(90deg, #7a6fff 0%, #67e8ff 100%);
+.ai-analysis-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ff8e53);
   color: #fff;
   border: none;
-  border-radius: 14px;
-  padding: 7px 22px;
-  font-size: 15px;
-  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
   cursor: pointer;
-  box-shadow: 0 2px 8px #7a6fff22;
-  transition: background 0.2s, transform 0.2s;
-  margin-top: 2px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
+  font-weight: 600;
+  align-self: flex-start;
 }
-.ai-assistant-body button:hover {
-  background: linear-gradient(90deg, #67e8ff 0%, #7a6fff 100%);
-  transform: translateY(-2px) scale(1.04);
+
+.ai-analysis-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(255, 107, 107, 0.4);
+  background: linear-gradient(45deg, #ff8e53, #ff6b6b);
 }
+
+.ai-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ai-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.ai-input:focus {
+  border-color: #4c97ff;
+  box-shadow: 0 0 0 3px rgba(76, 151, 255, 0.1);
+}
+
+.ai-send-btn {
+  background: linear-gradient(45deg, #4c97ff, #667eea);
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(76, 151, 255, 0.3);
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.ai-send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(76, 151, 255, 0.4);
+  background: linear-gradient(45deg, #667eea, #4c97ff);
+}
+
+/* ...其他现有样式保持不变... */
 </style>
 
 

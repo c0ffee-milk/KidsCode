@@ -12,7 +12,9 @@
         </div>
         <div class="blocks-header">
           <span>编程区</span>
-          <button @click="initBlockly" class="init-btn">重新初始化</button>
+          <div class="header-buttons">
+            <button @click="initBlockly" class="init-btn">重新初始化</button>
+          </div>
         </div>
         <div ref="blocklyDiv" class="python-blocks-div"></div>
       </div>
@@ -66,10 +68,262 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { ref, onMounted, nextTick, watch, inject } from 'vue'
 import { useRoute } from 'vue-router'
 import * as Blockly from 'blockly'
 import 'blockly/javascript'
+
+// 注入 AI 助手方法
+const showAIError = inject('showAIError')
+
+// 每关的标准错误类型数据
+const levelErrors = [
+  // 第一关
+  [
+    {
+      type: 'out_of_map',
+      position: [0, 10],
+      message: '🚫 骑士走出地图右边界（第0行第10列），应该停止并往左走。'
+    },
+    {
+      type: 'not_arrive_end',
+      message: '⚠️ 骑士还没有到达终点（第0行第9列），请继续往右走。'
+    },
+    {
+      type: 'wrong_steps',
+      message: '💡 提示：本关需要9步才能到达终点，请检查步数设置。'
+    }
+  ],
+  // 第二关
+  [
+    {
+      type: 'out_of_map',
+      position: [0, 11],
+      message: '🚫 骑士走出地图右边界（第0行第11列），应该停止并往左走。'
+    },
+    {
+      type: 'not_arrive_end',
+      message: '⚠️ 骑士还没有到达终点（第0行第10列），请继续往右走。'
+    },
+    {
+      type: 'wrong_steps',
+      message: '💡 提示：本关需要10步才能到达终点，建议使用"骑士向前移动N步"积木。'
+    }
+  ],
+  // 第三关
+  [
+    {
+      type: 'hit_obstacle',
+      position: [2, 3],
+      message: '🧱 骑士撞到障碍物（第2行第3列），建议往上或下绕开。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [0, 2],
+      message: '🧱 骑士撞到障碍物（第0行第2列），建议往下绕开。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [0, 6],
+      message: '🧱 骑士撞到障障碍物（第0行第6列），建议往下或左绕开。'
+    },
+    {
+      type: 'wrong_path',
+      message: '🤔 路径规划错误，需要使用判断语句绕过障碍物。'
+    }
+  ],
+  // 第四关
+  [
+    {
+      type: 'hit_obstacle',
+      position: [2, 3],
+      message: '🧱 骑士撞到障碍物（第2行第3列），建议往上走。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [1, 1],
+      message: '🧱 骑士撞到障碍物（第1行第1列），建议往下或右绕开。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [0, 9],
+      message: '🧱 骑士撞到障障碍物（第0行第9列），建议往下或左绕开。'
+    },
+    {
+      type: 'complex_path',
+      message: '🔄 障碍物较多，建议使用while循环+if判断组合进行路径规划。'
+    }
+  ],
+  // 第五关
+  [
+    {
+      type: 'hit_obstacle',
+      position: [2, 3],
+      message: '🧱 骑士撞到障碍物（第2行第3列），建议往上或下绕开。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [1, 4],
+      message: '🧱 骑士撞到障碍物（第1行第4列），建议往下或左绕开。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [1, 7],
+      message: '🧱 骑士撞到障碍物（第1行第7列），建议绕开障碍群。'
+    },
+    {
+      type: 'ultimate_challenge',
+      message: '🏆 终极挑战！地图更大障碍更多，需要灵活运用循环、判断和变量。'
+    }
+  ],
+  // 第六关
+  [
+    {
+      type: 'hit_obstacle',
+      position: [2, 6],
+      message: '🧱 骑士撞到障碍物（第2行第6列），建议往上或左绕开。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [1, 1],
+      message: '🧱 骑士撞到障碍物（第1行第1列），建议往下或右绕开。'
+    },
+    {
+      type: 'branch_choice',
+      message: '🛤️ 分岔路线选择：有多条路线可选，需要用if判断选择最优路线。'
+    }
+  ],
+  // 第七关
+  [
+    {
+      type: 'hit_obstacle',
+      position: [0, 1],
+      message: '🧱 骑士撞到障碍物（第0行第1列），建议往下或右绕开。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [1, 2],
+      message: '🧱 骑士撞到障碍物（第1行第2列），建议往上或下绕开。'
+    },
+    {
+      type: 'nested_loop',
+      message: '🔄 障碍物分布复杂，建议使用嵌套循环解决路径问题。'
+    }
+  ],
+  // 第八关
+  [
+    {
+      type: 'hit_fog',
+      position: [0, 1],
+      message: '🌫️ 骑士走进迷雾（第0行第1列），建议尝试其它方向绕开迷雾。'
+    },
+    {
+      type: 'hit_fog',
+      position: [0, 5],
+      message: '🌫️ 骑士走进迷雾（第0行第5列），建议尝试其它方向绕开迷雾。'
+    },
+    {
+      type: 'hit_fog',
+      position: [2, 4],
+      message: '🌫️ 骑士走进迷雾（第2行第4列），建议尝试其它方向绕开迷雾。'
+    },
+    {
+      type: 'fog_challenge',
+      message: '🌫️ 迷雾挑战：部分区域不可见，需要多尝试不同路线！'
+    }
+  ],
+  // 第九关
+  [
+    {
+      type: 'hit_obstacle',
+      position: [0, 2],
+      message: '🧱 骑士撞到障碍物（第0行第2列），建议往下绕开。'
+    },
+    {
+      type: 'hit_obstacle',
+      position: [1, 7],
+      message: '🧱 骑士撞到障碍物（第1行第7列），建议绕开障碍群。'
+    },
+    {
+      type: 'global_planning',
+      message: '🗺️ 全局规划：终点隐藏在角落，需要先分析地图再编程！'
+    }
+  ],
+  // 第十关
+  [
+    {
+      type: 'hit_obstacle',
+      position: [0, 2],
+      message: '🧱 骑士撞到障碍物（第0行第2列），建议往下绕开。'
+    },
+    {
+      type: 'hit_fog',
+      position: [0, 1],
+      message: '🌫️ 骑士走进迷雾（第0行第1列），建议尝试其它方向。'
+    },
+    {
+      type: 'hit_fog',
+      position: [2, 4],
+      message: '🌫️ 骑士走进迷雾（第2行第4列），建议绕开迷雾区域。'
+    },
+    {
+      type: 'ultimate_maze',
+      message: '🎯 终极迷宫：障碍、迷雾、分岔全部出现，综合运用所有编程知识！'
+    }
+  ]
+]
+
+// 显示当前关卡的所有标准错误
+function showCurrentLevelErrors() {
+  const errors = levelErrors[currentLevel.value] || []
+  if (errors.length === 0) {
+    showAIError && showAIError(`😅 第${currentLevel.value + 1}关暂无标准错误数据`)
+    return
+  }
+  
+  // 发送关卡介绍
+  showAIError && showAIError(`🎮 第${currentLevel.value + 1}关 - ${levels[currentLevel.value].name} 标准错误分析：`)
+  
+  // 逐个发送错误信息
+  errors.forEach((error, index) => {
+    setTimeout(() => {
+      showAIError && showAIError(error.message)
+    }, (index + 1) * 500) // 每0.5秒发送一条
+  })
+  
+  // 最后发送总结
+  setTimeout(() => {
+    showAIError && showAIError(`💡 以上是第${currentLevel.value + 1}关的常见错误，遇到问题时可以参考这些提示哦！`)
+  }, (errors.length + 1) * 500)
+}
+
+// 根据错误类型显示具体错误
+function showStandardError(type, row, col) {
+  const errors = levelErrors[currentLevel.value] || []
+  let msg = ''
+  
+  // 查找匹配的错误
+  if (type === 'hit_obstacle' || type === 'hit_fog' || type === 'out_of_map') {
+    const err = errors.find(e => e.type === type && e.position && e.position[0] === row && e.position[1] === col)
+    if (err) msg = err.message
+  } else {
+    const err = errors.find(e => e.type === type)
+    if (err) msg = err.message
+  }
+  
+  // 如果没找到匹配的，使用默认提示
+  if (!msg) {
+    if (type === 'hit_obstacle') msg = `🧱 骑士撞到了障碍物（第${row}行第${col}列），请尝试其它方向绕开。`
+    if (type === 'hit_fog') msg = `🌫️ 骑士走进了迷雾（第${row}行第${col}列），请尝试其它方向绕开。`
+    if (type === 'out_of_map') msg = `🚫 骑士走出了地图边界（第${row}行第${col}列），请回到地图内。`
+    if (type === 'not_arrive_end') msg = `⚠️ 骑士还没有到达终点，请继续寻路。`
+  }
+  
+  showAIError && showAIError(msg)
+}
+
+// 暴露给全局使用
+window.showCurrentLevelErrors = showCurrentLevelErrors
 
 const levels = [
   {
@@ -794,6 +1048,30 @@ function nextLevel() {
   font-size: 18px;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.ai-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  font-weight: 600;
+}
+
+.ai-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  background: linear-gradient(45deg, #ff8e53, #ff6b6b);
+}
+
 .init-btn {
   background: linear-gradient(45deg, #4c97ff, #667eea);
   color: white;
@@ -1258,4 +1536,31 @@ function nextLevel() {
   color: #4c97ff;
   border-radius: 0 0 20px 20px;
 }
+
+/*AI模块 */
+.header-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ai-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  font-weight: 600;
+}
+
+.ai-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  background: linear-gradient(45deg, #ff8e53, #ff6b6b);
+}
+
 </style>
