@@ -8,7 +8,7 @@
           <h1 class="hero-title"> 少儿编程世界</h1>
           <p class="hero-subtitle">通过有趣的游戏学习编程基础</p>
           <div class="action-buttons">
-            <el-button type="primary" size="large" @click="router.push('/learn')">
+            <el-button type="primary" size="large" @click="router.push('/learn/web')">
               <el-icon><Edit /></el-icon>
               点击开启学习之旅吧！
             </el-button>
@@ -63,7 +63,7 @@
         <div class="cta-content">
           <h2>准备好开始你的编程之旅了吗？</h2>
           <p>加入我们，让孩子在快乐中学习编程！</p>
-          <el-button type="primary" size="large" @click="router.push('/learn')">
+          <el-button type="primary" size="large" @click="router.push('/learn/web')">
             立即开始
           </el-button>
         </div>
