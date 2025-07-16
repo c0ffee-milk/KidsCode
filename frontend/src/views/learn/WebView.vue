@@ -104,16 +104,16 @@ const route = useRoute()
 // 初始化 levels
 const defaultPassed = JSON.parse(localStorage.getItem('kidscode_passed') || '[true,true,true,true,false,false,false,false,false,false]')
 const levels = reactive([
-  { passed: defaultPassed[0]},   // 1
-  { passed: defaultPassed[1]},   // 2
-  { passed: defaultPassed[2]},   // 3
-  { passed: defaultPassed[3]},   // 4
-  { passed: defaultPassed[4]},   // 5
-  { passed: defaultPassed[5]},   // 6
-  { passed: defaultPassed[6]},   // 7
-  { passed: defaultPassed[7]},   // 8
-  { passed: defaultPassed[8]},   // 9
-  { passed: defaultPassed[9]}    // 10
+  { passed: true},   // 1
+  { passed: true},   // 2
+  { passed: true},   // 3
+  { passed: true},   // 4
+  { passed: true},   // 5
+  { passed: true},   // 6
+  { passed: true},   // 7
+  { passed: true },   // 8
+  { passed: true },   // 9
+  { passed: true }   // 10
 ])
 const currentLevelIndex = ref(2)
 
@@ -125,6 +125,9 @@ watch(
   },
   { deep: true }
 )
+
+// 随机设置当前关卡
+currentLevelIndex.value = Math.floor(Math.random() * levels.length)
 
 // --- 布局常量 ---
 const boxSize = 82 // 微调尺寸
