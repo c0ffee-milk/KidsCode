@@ -95,25 +95,36 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 
-// --- 响应式状态定义 ---
+// 初始化 levels
+const defaultPassed = JSON.parse(localStorage.getItem('kidscode_passed') || '[true,true,true,true,false,false,false,false,false,false]')
 const levels = reactive([
-  { passed: true},   // 1
-  { passed: true },   // 2
-  { passed: true },  // 3
-  { passed: true },  // 4
-  { passed: false },  // 5
-  { passed: false },  // 6
-  { passed: false },  // 7
-  { passed: false },  // 8
-  { passed: false },  // 9
-  { passed: false }   // 10
+  { passed: defaultPassed[0]},   // 1
+  { passed: defaultPassed[1]},   // 2
+  { passed: defaultPassed[2]},   // 3
+  { passed: defaultPassed[3]},   // 4
+  { passed: defaultPassed[4]},   // 5
+  { passed: defaultPassed[5]},   // 6
+  { passed: defaultPassed[6]},   // 7
+  { passed: defaultPassed[7]},   // 8
+  { passed: defaultPassed[8]},   // 9
+  { passed: defaultPassed[9]}    // 10
 ])
 const currentLevelIndex = ref(2)
+
+// 每次 passed 状态变化时保存
+watch(
+  () => levels.map(l => l.passed),
+  (val) => {
+    localStorage.setItem('kidscode_passed', JSON.stringify(val))
+  },
+  { deep: true }
+)
 
 // --- 布局常量 ---
 const boxSize = 82 // 微调尺寸
@@ -155,7 +166,13 @@ function handleLevelClick(i) {
   if (isUnlocked(i)) {
     console.log(`跳转到关卡 ${i + 1}`)
     router.push({ name: 'LearnPython' ,query: { level: i + 1 } })
+    //更新已通关状态(跳转即可视为通关)
+    for(let j=0;j<=i;j++){
+      levels[j].passed = true
+    }
+    currentLevelIndex.value = i
   }
+ 
 }
 
 function goPass() {
@@ -166,6 +183,24 @@ function goPass() {
 function goToLevel(idx) {
   router.push({ name: 'PythonView', query: { level: idx } })
 }
+
+// 监听路由参数变化，自动同步当前关卡和通关状态
+watch(
+  () => route.query.level,
+  (newLevel) => {
+    if (newLevel && !isNaN(Number(newLevel))) {
+      const idx = Number(newLevel) - 1
+      if (idx >= 0 && idx < levels.length) {
+        currentLevelIndex.value = idx
+        // 自动将已通关的关卡标记为 passed
+        for (let j = 0; j <= idx; j++) {
+          levels[j].passed = true
+        }
+      }
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
