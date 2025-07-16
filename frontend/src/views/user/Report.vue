@@ -116,7 +116,7 @@ const loadAIEvaluation = async () => {
     }
   } catch (error: any) {
     console.error('加载AI评估失败:', error);
-    ElMessage.error('加载评估数据失败，请稍后重试');
+    // ElMessage.error('加载评估数据失败，请稍后重试');
     // 使用默认数据
     abilityScores.value = [85, 72, 68, 90, 76];
     evaluationText.value = '该学员在代码规范方面表现优秀，逻辑思维和空间想象能力较强，创造力和问题解决能力有待进一步提升。';
