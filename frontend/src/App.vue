@@ -120,6 +120,29 @@
   </footer> -->
 
   <el-backtop :right="50" :bottom="50" />
+
+  <div class="ai-assistant-fab" @click="showAI = true" style="color: #fff;">
+    <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="3" fill="none"/>
+      <ellipse cx="24" cy="28" rx="10" ry="6" fill="currentColor" opacity="0.8"/>
+      <circle cx="18" cy="22" r="2" fill="#fff"/>
+      <circle cx="30" cy="22" r="2" fill="#fff"/>
+      <!-- 可根据需要美化 -->
+    </svg>
+  </div>
+  <div v-if="showAI" class="ai-assistant-modal">
+    <div class="ai-assistant-header">
+      <span>AI助手</span>
+      <button @click="showAI = false">关闭</button>
+    </div>
+    <div class="ai-assistant-body">
+      <div class="ai-assistant-history">
+        <div v-for="(msg, i) in aiHistory" :key="i" :class="msg.role">{{ msg.text }}</div>
+      </div>
+      <input v-model="aiInput" @keyup.enter="sendAI" placeholder="请输入你的问题..." />
+      <button @click="sendAI">发送</button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -135,6 +158,19 @@ const handleLogout = () => {
   router.push('/')
 }
 
+const showAI = ref(false)
+const aiInput = ref('')
+const aiHistory = ref([{ role: 'ai', text: '你好，我是AI助手，有什么可以帮你？' }])
+
+function sendAI() {
+  if (!aiInput.value.trim()) return
+  aiHistory.value.push({ role: 'user', text: aiInput.value })
+  // 这里仅做前端模拟回复
+  setTimeout(() => {
+    aiHistory.value.push({ role: 'ai', text: '（AI助手模拟回复）你刚才说：' + aiInput.value })
+  }, 600)
+  aiInput.value = ''
+}
 </script>
 
 <style>
@@ -401,6 +437,70 @@ body {
   text-align: center;
   box-shadow: 0 2px 8px #e6e6fa40;
   font-weight: bold; /* 让tip更醒目 */
+}
+
+/* AI助手样式 */
+.ai-assistant-fab {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: transparent; /* 透明背景 */
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  border: none;
+  transition: box-shadow 0.2s;
+  /* 可选：鼠标悬停时加轻微阴影 */
+}
+.ai-assistant-fab:hover {
+  box-shadow: 0 4px 16px #7a6fff33;
+}
+.ai-assistant-modal {
+  position: fixed;
+  right: 32px;
+  bottom: 100px;
+  width: 320px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px #7a6fff33;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+}
+.ai-assistant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  font-weight: bold;
+}
+.ai-assistant-body {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ai-assistant-history {
+  min-height: 80px;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+.ai {
+  color: #7a6fff;
+  margin-bottom: 4px;
+}
+.user {
+  color: #333;
+  text-align: right;
+  margin-bottom: 4px;
 }
 
 /* 响应式布局 */
