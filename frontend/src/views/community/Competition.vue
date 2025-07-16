@@ -252,7 +252,7 @@ const competitions = ref<Competition[]>([
   {
     id: 1,
     title: '全国少儿Scratch编程挑战赛',
-    cover: 'https://placeholder.pics/svg/400x200/ffe7c2/555555/Scratch竞赛',
+    cover: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.TnsW6xL0iHXFh7igw6ehJwHaFh?w=234&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
     description: '面向全国青少年的Scratch编程大赛，锻炼创意与逻辑思维，丰厚奖品等你来拿！参赛者需要在规定时间内完成一个完整的Scratch项目，主题为"未来世界"。',
     date: '2025-08-01 ~ 2025-08-15',
     type: 'Scratch',
@@ -267,7 +267,7 @@ const competitions = ref<Competition[]>([
   {
     id: 2,
     title: 'Python趣味编程赛',
-    cover: 'https://placeholder.pics/svg/400x200/e0f7fa/555555/Python竞赛',
+    cover: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.Az8ohcps7tvIMbhG32r98wHaDa?w=346&h=161&c=7&r=0&o=5&dpr=1.5&pid=1.7',
     description: '用Python解决趣味编程题目，提升编程能力，赢取荣誉！包含算法题、数据处理、小游戏开发等多个环节。',
     date: '2025-07-10 ~ 2025-07-20',
     type: 'Python',
@@ -282,7 +282,7 @@ const competitions = ref<Competition[]>([
   {
     id: 3,
     title: '网页创意设计赛',
-    cover: 'https://placeholder.pics/svg/400x200/e7ffe0/555555/Web竞赛',
+    cover: 'https://tse2-mm.cn.bing.net/th/id/OIP-C.OHj4XmpTolaF2RWavSY7OgHaFU?w=228&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
     description: '发挥你的网页设计创意，制作炫酷网页，展示你的才华！要求响应式设计，兼容多种设备。',
     date: '2025-06-05 ~ 2025-06-18',
     type: 'Web',
@@ -297,7 +297,7 @@ const competitions = ref<Competition[]>([
   {
     id: 4,
     title: '少儿AI编程创新赛',
-    cover: 'https://placeholder.pics/svg/400x200/fff2e6/555555/AI编程',
+    cover: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.wFcokXWElGwB8aLNXip69QHaHa?w=173&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
     description: '探索人工智能的奥秘，用编程实现AI应用，培养未来科技人才！',
     date: '2025-09-15 ~ 2025-09-30',
     type: 'AI',
