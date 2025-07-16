@@ -465,111 +465,134 @@ body {
   position: fixed;
   right: 32px;
   bottom: 100px;
-  width: 320px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px #7a6fff33;
+  width: 340px;
+  background: linear-gradient(135deg, #f9e7fe 0%, #e0e7ff 100%);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px #7a6fff33, 0 2px 8px #fff8;
   z-index: 10000;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  border: 2px solid #e0e7ff;
+  animation: ai-pop-in 0.4s cubic-bezier(.68,-0.55,.27,1.55);
 }
+
+@keyframes ai-pop-in {
+  0% { transform: scale(0.8) translateY(40px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
 .ai-assistant-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #7a6fff 0%, #67e8ff 100%);
+  color: #fff;
   font-weight: bold;
+  font-size: 18px;
+  border-bottom: 1.5px solid #e0e7ff;
+  letter-spacing: 1px;
 }
+
+.ai-assistant-header button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.ai-assistant-header button:hover {
+  background: #fff3;
+}
+
 .ai-assistant-body {
-  padding: 12px 16px;
+  padding: 16px 18px 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: transparent;
+}
+
+.ai-assistant-history {
+  min-height: 100px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-right: 2px;
 }
-.ai-assistant-history {
-  min-height: 80px;
-  max-height: 180px;
-  overflow-y: auto;
-  margin-bottom: 8px;
-}
-.ai {
+
+.ai-assistant-history .ai {
+  align-self: flex-start;
+  background: linear-gradient(90deg, #e0e7ff 0%, #f9e7fe 100%);
   color: #7a6fff;
+  border-radius: 16px 16px 16px 4px;
+  padding: 8px 16px;
+  font-size: 15px;
+  box-shadow: 0 2px 8px #7a6fff11;
+  max-width: 80%;
+  word-break: break-all;
+  position: relative;
+}
+.ai-assistant-history .ai::before {
+  content: "🤖";
+  margin-right: 6px;
+}
+
+.ai-assistant-history .user {
+  align-self: flex-end;
+  background: linear-gradient(90deg, #67e8ff 0%, #7a6fff 100%);
+  color: #fff;
+  border-radius: 16px 16px 4px 16px;
+  padding: 8px 16px;
+  font-size: 15px;
+  box-shadow: 0 2px 8px #67e8ff22;
+  max-width: 80%;
+  word-break: break-all;
+  position: relative;
+}
+.ai-assistant-history .user::after {
+  content: "🧑";
+  margin-left: 6px;
+}
+
+.ai-assistant-body input {
+  border: 1.5px solid #e0e7ff;
+  border-radius: 16px;
+  padding: 10px 14px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.2s;
   margin-bottom: 4px;
+  background: #fff;
 }
-.user {
-  color: #333;
-  text-align: right;
-  margin-bottom: 4px;
-}
-
-/* 响应式布局 */
-@media (max-width: 1400px) {
-  .header-content {
-    max-width: 100%;
-    padding: 0 24px;
-  }
-
-  .nav-section {
-    max-width: 800px;
-    margin: 0 20px;
-  }
+.ai-assistant-body input:focus {
+  border: 1.5px solid #7a6fff;
 }
 
-@media (max-width: 1200px) {
-  .header-content {
-    padding: 0 16px;
-  }
-
-  .nav-section {
-    max-width: 700px;
-    margin: 0 16px;
-  }
-
-  .app-menu .el-menu-item,
-  .app-menu .el-sub-menu {
-    margin: 0 2px;
-    padding: 0 10px;
-    font-size: 14px;
-    min-width: 80px;
-  }
-
-  .app-menu .el-sub-menu .el-sub-menu__title {
-    padding: 0 10px;
-    min-width: 100px;
-  }
+.ai-assistant-body button {
+  align-self: flex-end;
+  background: linear-gradient(90deg, #7a6fff 0%, #67e8ff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 7px 22px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #7a6fff22;
+  transition: background 0.2s, transform 0.2s;
+  margin-top: 2px;
 }
-
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    height: auto;
-    padding: 16px;
-    gap: 16px;
-  }
-
-  .nav-section {
-    max-width: 100%;
-    margin: 0;
-  }
-
-  .app-menu {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .app-menu .el-menu-item,
-  .app-menu .el-sub-menu {
-    margin: 4px;
-    min-width: auto;
-  }
-
-  .logo-section {
-    min-width: auto;
-  }
+.ai-assistant-body button:hover {
+  background: linear-gradient(90deg, #67e8ff 0%, #7a6fff 100%);
+  transform: translateY(-2px) scale(1.04);
 }
 </style>
 
