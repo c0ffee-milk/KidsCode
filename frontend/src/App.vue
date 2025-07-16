@@ -41,7 +41,7 @@
               <el-icon><Document /></el-icon>Python基础
             </el-menu-item>
             <el-menu-item index="/learn/web">
-              <el-icon><Monitor /></el-icon>网页制作
+              <el-icon><Monitor /></el-icon>关卡选择
             </el-menu-item>
             <el-menu-item index="/learn/game">
               <el-icon><Trophy /></el-icon>游戏开发

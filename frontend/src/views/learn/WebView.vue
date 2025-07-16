@@ -8,6 +8,8 @@
       :height="svgHeight"
       preserveAspectRatio="xMidYMid meet"
     >
+
+
       <defs>
         <!-- 优化发光效果，更柔和 -->
         <filter id="white-glow" x="-50%" y="-50%" width="200%" height="200%">
@@ -88,6 +90,7 @@
       </g>
     </svg>
     <button class="pass-btn" @click="goPass">通关演示跳转</button>
+    
   </div>
 </template>
 
@@ -99,13 +102,16 @@ const router = useRouter()
 
 // --- 响应式状态定义 ---
 const levels = reactive([
-  { passed: true },   // 1
+  { passed: true},   // 1
   { passed: true },   // 2
-  { passed: false },  // 3
-  { passed: false },  // 4
+  { passed: true },  // 3
+  { passed: true },  // 4
   { passed: false },  // 5
   { passed: false },  // 6
   { passed: false },  // 7
+  { passed: false },  // 8
+  { passed: false },  // 9
+  { passed: false }   // 10
 ])
 const currentLevelIndex = ref(2)
 
@@ -148,12 +154,17 @@ function levelPos(i) {
 function handleLevelClick(i) {
   if (isUnlocked(i)) {
     console.log(`跳转到关卡 ${i + 1}`)
-    router.push({ name: 'LearnPython' })
+    router.push({ name: 'LearnPython' ,query: { level: i + 1 } })
   }
 }
 
 function goPass() {
-  router.push({ name: 'LearnPython' })
+  // 传递当前选择的关卡索引（+1为关卡号）
+  router.push({ name: 'LearnPython', query: { level: currentLevelIndex.value + 1 } })
+}
+
+function goToLevel(idx) {
+  router.push({ name: 'PythonView', query: { level: idx } })
 }
 </script>
 

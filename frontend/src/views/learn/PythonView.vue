@@ -1,8 +1,8 @@
 <template>
   <div class="python-main">
     <div class="python-toolbar">
-      <h1>Python闯关 - 第二关</h1>
-      <span class="level-desc">引入循环while的思想，可以在此处引入“重复执行...直到终点”的动作。</span>
+      <h1>Python闯关 - {{ levels[currentLevel].name }}</h1>
+      <span class="level-desc">{{ levels[currentLevel].desc }}</span>
     </div>
     <div class="python-content">
       <!-- 左侧 Blockly 拖拽区 -->
@@ -21,16 +21,24 @@
         <div class="stage-toolbar">
           <button class="flag-btn" @click="runCode">运行</button>
           <span class="stage-mode">拖拽积木并运行，骑士将自动到达终点</span>
+          <button v-if="currentLevel < levels.length - 1" @click="nextLevel" class="init-btn">下一关</button>
         </div>
         <div class="stage-area">
-          <h3>关卡地图</h3>
-          <div class="map-row">
-            <span v-for="(cell, idx) in mapData[0]" :key="idx" :class="cellClass(cell)">{{ cellSymbol(cell, idx) }}</span>
+          <h3>关卡地图 - {{ levels[currentLevel].name }}</h3>
+          <div v-for="(row, rowIdx) in mapData" :key="rowIdx" class="map-row">
+            <span
+              v-for="(cell, idx) in row"
+              :key="idx"
+              :class="cellClass(cell, idx, rowIdx)"
+            >
+              {{ cellSymbol(cell, idx, rowIdx) }}
+            </span>
           </div>
           <div class="map-desc">
             <span class="start">🏇 起点</span>
             <span class="end">🏁 终点</span>
             <span class="empty">⬜ 路径</span>
+            <span style="color:#b71c1c;">🧱 障碍</span>
           </div>
         </div>
         <div v-if="showFeedback" class="run-feedback">🎉 恭喜你，骑士已到达终点！</div>
@@ -38,24 +46,18 @@
     </div>
     <div v-if="showIntro" class="intro-modal">
       <div class="intro-content">
-        <h2>第二关：while循环闯关</h2>
+        <h2>{{ levels[currentLevel].intro.title }}</h2>
         <h3>教学目标</h3>
         <ul>
-          <li>理解并掌握 while 循环的基本用法</li>
-          <li>学会用循环让骑士自动前进直到终点</li>
-          <li>体验拖拽式编程，感受编程乐趣</li>
+          <li v-for="goal in levels[currentLevel].intro.goals" :key="goal">{{ goal }}</li>
         </ul>
         <h3>关卡规则</h3>
         <ul>
-          <li>骑士初始在起点（🏇），目标是到达终点（🏁）</li>
-          <li>每次只能前进一格</li>
-          <li>请用“重复执行直到到达终点”+“骑士向前移动一步”完成闯关</li>
+          <li v-for="rule in levels[currentLevel].intro.rules" :key="rule">{{ rule }}</li>
         </ul>
         <h3>编程提示</h3>
         <ul>
-          <li>拖拽“循环”积木和“动作”积木到编程区</li>
-          <li>点击右侧“运行”按钮，观察骑士自动前进</li>
-          <li>如遇问题可点击“重新初始化”重置编程区</li>
+          <li v-for="tip in levels[currentLevel].intro.tips" :key="tip">{{ tip }}</li>
         </ul>
         <button class="intro-confirm" @click="showIntro = false">我已了解，开始闯关</button>
       </div>
@@ -64,33 +66,282 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import * as Blockly from 'blockly'
 import 'blockly/javascript'
 
-const mapData = ref([[1,0,0,0,0,0,0,0,0,2]])
-const knightPos = ref(0) // 骑士当前位置
+const levels = [
+  {
+    name: '第一关',
+    desc: '骑士直线前进，体验编程的乐趣。',
+    map: [[1, 0, 0, 0, 0, 0, 0, 0, 0, 2]],
+    intro: {
+      title: '第一关：直线前进',
+      goals: [
+        '了解编程闯关的基本玩法',
+        '让骑士从起点走到终点',
+        '体验拖拽式编程'
+      ],
+      rules: [
+        '骑士初始在起点（🏇），目标是到达终点（🏁）',
+        '每次只能前进一格',
+        '请用“骑士向前移动一步”完成闯关'
+      ],
+      tips: [
+        '拖拽“动作”积木到编程区',
+        '点击右侧“运行”按钮，观察骑士前进',
+        '如遇问题可点击“重新初始化”重置编程区'
+      ]
+    }
+  },
+  {
+    name: '第二关',
+    desc: '本关引入多步移动，体验参数积木的用法。',
+    map: [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]],
+    intro: {
+      title: '第二关：多步移动',
+      goals: [
+        '学会使用带参数的积木',
+        '让骑士一次性前进多步到达终点'
+      ],
+      rules: [
+        '骑士初始在起点（🏇），目标是到达终点（🏁）',
+        '可以使用“骑士向前移动N步”积木',
+        '本关无需循环'
+      ],
+      tips: [
+        '拖拽“骑士向前移动”积木到编程区',
+        '设置步数为正确的值',
+        '点击“运行”按钮，骑士会直接到达终点'
+      ]
+    }
+  },
+  {
+    name: '第三关',
+    desc: '本关引入障碍物，需要用判断语句绕过障碍。',
+    map: [
+      [0, 0, -1, 0, 0, 0, -1, 0, 0, 2],
+      [0, -1, 0, 0, -1, 0, 0, 0, 0, 0],
+      [1, 0, 0, -1, 0, 0, -1, 0, 0, 0]
+    ],
+    intro: {
+      title: '第三关：障碍物闯关',
+      goals: [
+        '掌握if判断',
+        '学会绕过障碍'
+      ],
+      rules: [
+        '有障碍物，不能直接前进'
+      ],
+      tips: [
+        '用判断积木绕开障碍'
+      ]
+    }
+  },
+  {
+    name: '第四关',
+    desc: '本关需要用循环和判断结合，绕过多个障碍到达终点。',
+    map: [
+      [0, 0, -1, 0, 0, 0, 0, 0, 0, -1],
+      [0, -1, 0, 0, -1, 0, 0, -1, 0, 2],
+      [1, 0, 0, -1, 0, 0, -1, 0, 0, 0]
+    ],
+    intro: {
+      title: '第四关：循环与判断结合',
+      goals: [
+        '理解循环与判断的配合',
+        '掌握复杂路径的自动寻路'
+      ],
+      rules: [
+        '障碍物更多，需要合理规划路线',
+        '可以上下左右移动'
+      ],
+      tips: [
+        '尝试用while循环+if判断组合',
+        '注意每一步都要判断是否有障碍'
+      ]
+    }
+  },
+  {
+    name: '第五关',
+    desc: '终极挑战！地图更大，障碍更多，考验你的编程思维。',
+    map: [
+      [0, 0, -1, 0, 0, 0, -1, 0, 0, 2, 0, 0],
+      [0, -1, 0, 0, -1, 0, 0, -1, -1, -1, 0, 0],
+      [1, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0],
+      [0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0]
+    ],
+    intro: {
+      title: '第五关：终极挑战',
+      goals: [
+        '灵活运用循环、判断和变量',
+        '解决更复杂的迷宫问题'
+      ],
+      rules: [
+        '地图更大，障碍更多',
+        '需要多次判断和循环'
+      ],
+      tips: [
+        '多用循环和判断，分步调试',
+        '遇到困难可以先画出路线'
+      ]
+    }
+  },
+  {
+    name: '第六关',
+    desc: '引入分岔路线，选择最优路径到达终点。',
+    map: [
+      [0, 0, -1, 0, 0, 0, 0, 0, 2],
+      [0, -1, 0, -1, 0, -1, 0, -1, 0],
+      [1, 0, 0, 0, 0, 0, -1, 0, 0]
+    ],
+    intro: {
+      title: '第六关：分岔选择',
+      goals: [
+        '学会选择不同路线',
+        '理解分支结构'
+      ],
+      rules: [
+        '有多条路线可选，部分路线有障碍',
+        '选择最优路线到达终点'
+      ],
+      tips: [
+        '尝试用if判断选择路线',
+        '多观察地图结构'
+      ]
+    }
+  },
+  {
+    name: '第七关',
+    desc: '地图变大，障碍更复杂，考验循环嵌套。',
+    map: [
+      [0, -1, 0, 0, 0, -1, 0, 0, 2, 0, 0],
+      [0, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0],
+      [1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0],
+      [0, -1, 0, 0, -1, 0, 0, 0, -1, 0, 0]
+    ],
+    intro: {
+      title: '第七关：循环嵌套',
+      goals: [
+        '掌握循环嵌套结构',
+        '解决更复杂的路径问题'
+      ],
+      rules: [
+        '障碍物分布更复杂',
+        '需要多层循环和判断'
+      ],
+      tips: [
+        '尝试用嵌套循环',
+        '每一步都要判断是否有障碍'
+      ]
+    }
+  },
+  {
+    name: '第八关',
+    desc: '引入“迷雾”区域，部分路径不可见。',
+    map: [
+      [0, -2, -1, 0, 0, -2, 0, 0, 2, 0, 0],
+      [0, 0, -2, 0, -1, 0, -2, 0, 0, -1, 0],
+      [1, 0, 0, -1, -2, 0, 0, -1, 0, 0, 0],
+      [0, -1, 0, 0, -1, 0, 0, 0, -2, 0, 0]
+    ],
+    intro: {
+      title: '第八关：迷雾挑战',
+      goals: [
+        '应对未知区域',
+        '合理规划路径'
+      ],
+      rules: [
+        '部分区域为迷雾（🌫️），不可见',
+        '需要尝试多种方案'
+      ],
+      tips: [
+        '多尝试不同路线',
+        '遇到迷雾时要小心'
+      ]
+    }
+  },
+  {
+    name: '第九关',
+    desc: '地图更大，终点隐藏在角落，考验全局规划。',
+    map: [
+      [0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 2],
+      [0, -1, 0, 0, -1, 0, 0, -1, -1, -1, 0, 0],
+      [1, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0],
+      [0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0],
+      [0, 0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0]
+    ],
+    intro: {
+      title: '第九关：全局规划',
+      goals: [
+        '学会全局思考',
+        '合理利用循环和判断'
+      ],
+      rules: [
+        '终点隐藏在地图角落',
+        '需要全局规划路线'
+      ],
+      tips: [
+        '先分析地图再编程',
+        '多用循环和判断'
+      ]
+    }
+  },
+  {
+    name: '第十关',
+    desc: '终极迷宫，障碍、迷雾、分岔全部出现，挑战极限！',
+    map: [
+      [0, -2, -1, 0, 0, -2, 0, 0, 2, 0, 0, -1, 0],
+      [0, 0, -2, 0, -1, 0, -2, 0, 0, -1, 0, 0, 0],
+      [1, 0, 0, -1, -2, 0, 0, -1, 0, 0, 0, -2, 0],
+      [0, -1, 0, 0, -1, 0, 0, 0, -2, 0, 0, 0, 0],
+      [0, 0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0]
+    ],
+    intro: {
+      title: '第十关：极限挑战',
+      goals: [
+        '综合运用所有编程知识',
+        '解决最复杂的迷宫'
+      ],
+      rules: [
+        '障碍、迷雾、分岔全部出现',
+        '需要多次尝试和优化'
+      ],
+      tips: [
+        '多用循环、判断和变量',
+        '遇到困难不要放弃，多尝试'
+      ]
+    }
+  }
+]
+
+const route = useRoute()
+const currentLevel = ref(0)
+const mapData = ref(JSON.parse(JSON.stringify(levels[currentLevel.value].map)))
+const knightPos = ref(0)
+const knightRow = ref(2) // 添加行位置记录
 const blocklyDiv = ref(null)
 let workspace = null
 const showFeedback = ref(false)
 const showIntro = ref(true)
-const blockTip = ref('请拖拽"while循环"和"移动一步"积木到编程区，然后点击右侧"运行"按钮。')
 const loadingBlockly = ref(true)
 let blocklyRetryCount = 0
 const MAX_BLOCKLY_RETRY = 10
 
-function cellSymbol(cell, idx) {
-  if (idx === knightPos.value) return '🏇'
+function cellSymbol(cell, idx, rowIdx) {
+  // 在骑士当前位置显示骑士
+  if (idx === knightPos.value && rowIdx === knightRow.value) return '🏇'
   switch(cell) {
     case 2: return '🏁'
+    case -4: return '✅'
     case -1: return '🧱'
-    case -4: return '❌'
     case -2: return '🌫️'
     default: return '⬜'
   }
 }
 
-function cellClass(cell, idx) {
+function cellClass(cell, idx, rowIdx) {
   let baseClass = ''
   switch(cell) {
     case 1: baseClass = 'start'; break;
@@ -100,12 +351,10 @@ function cellClass(cell, idx) {
     case -2: baseClass = 'fog'; break;
     default: baseClass = 'empty';
   }
-
-  // 如果是骑士当前位置，添加特殊样式
-  if (idx === knightPos.value) {
+  // 在骑士当前位置加骑士样式
+  if (rowIdx === knightRow.value && idx === knightPos.value) {
     baseClass += ' knight-position'
   }
-
   return baseClass
 }
 
@@ -195,15 +444,33 @@ onMounted(() => {
     defineCustomBlocks()
     setTimeout(() => {
       initBlockly()
+      resetKnightToStart() // 加这一行
     }, 300)
   })
 })
 
-function initBlockly() {
-  console.log('开始初始化 Blockly...')
-  console.log('blocklyDiv.value:', blocklyDiv.value)
-  console.log('Blockly:', Blockly)
+// 监听路由参数变化
+watch(
+  () => route.query.level,
+  (newLevel) => {
+    if (newLevel && !isNaN(Number(newLevel))) {
+      const idx = Number(newLevel) - 1
+      if (idx >= 0 && idx < levels.length) {
+        currentLevel.value = idx
+        mapData.value = JSON.parse(JSON.stringify(levels[idx].map))
+        resetKnightToStart()
+        showIntro.value = true
+        loadingBlockly.value = true
+        setTimeout(() => {
+          initBlockly()
+        }, 300)
+      }
+    }
+  },
+  { immediate: true }
+)
 
+function initBlockly() {
   if (blocklyDiv.value && Blockly) {
     try {
       defineCustomBlocks();
@@ -230,11 +497,9 @@ function initBlockly() {
         zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 2, minScale: 0.5, scaleSpeed: 1.2 },
         grid: { spacing: 20, length: 3, colour: '#ccc', snap: true }
       })
-      console.log('Blockly 初始化成功:', workspace)
       loadingBlockly.value = false
       blocklyRetryCount = 0
     } catch (error) {
-      console.error('Blockly 初始化失败:', error)
       blocklyRetryCount++
       if (blocklyRetryCount < MAX_BLOCKLY_RETRY) {
         setTimeout(() => { initBlockly() }, 500)
@@ -277,44 +542,139 @@ window.showTip = function (tip) {
   alert(tip)
 }
 
+
+function resetKnightPosition() {
+  let startRow = mapData.value.length - 1
+  let col = mapData.value[startRow].findIndex(cell => cell === 1)
+  knightPos.value = col
+  knightRow.value = startRow
+}
+
+function resetKnightToStart() {
+  let startRow = mapData.value.length - 1
+  let col = mapData.value[startRow].findIndex(cell => cell === 1)
+  knightPos.value = col
+  knightRow.value = startRow
+}
+
+
+
 async function runCode() {
-  knightPos.value = 0
+  // 查找起点（值为1）在最后一行的位置
+  let startRow = mapData.value.length - 1
+  let col = mapData.value[startRow].findIndex(cell => cell === 1)
+  knightPos.value = col
+  knightRow.value = startRow // 初始化骑士行位置
   showFeedback.value = false
 
-  if (workspace) {
-    try {
-      const code = Blockly.JavaScript.workspaceToCode(workspace)
-      console.log('生成的代码:', code)
-      if (code.trim()) {
-        eval(code)
-      } else {
-        // 如果没有代码，默认演示
-        const steps = mapData.value[0].length - 1
-        for (let i = 0; i < steps; i++) {
-          await new Promise(r => setTimeout(r, 300))
-          knightPos.value++
-        }
-      }
-    } catch (error) {
-      console.error('代码执行出错:', error)
-      // 出错时也执行默认演示
-      const steps = mapData.value[0].length - 1
-      for (let i = 0; i < steps; i++) {
-        await new Promise(r => setTimeout(r, 300))
-        knightPos.value++
-      }
+  // 立即刷新页面，显示骑士在起点
+  await nextTick()
+
+  const map = mapData.value
+
+  // 广度优先搜索（BFS）自动寻路，允许上下左右移动，避开障碍
+  const queue = []
+  const visited = Array.from({ length: map.length }, () => Array(map[0].length).fill(false))
+  const prev = Array.from({ length: map.length }, () => Array(map[0].length).fill(null))
+
+  queue.push([startRow, col])
+  visited[startRow][col] = true
+
+  let found = false
+  let target = null
+
+  const directions = [
+    [0, 1],   // 右
+    [0, -1],  // 左
+    [-1, 0],  // 上
+    [1, 0]    // 下
+  ]
+
+  while (queue.length && !found) {
+    const [curRow, curCol] = queue.shift()
+    if (map[curRow][curCol] === 2) {
+      found = true
+      target = [curRow, curCol]
+      break
     }
-  } else {
-    // 没有 workspace 时执行默认演示
-    const steps = mapData.value[0].length - 1
-    for (let i = 0; i < steps; i++) {
-      await new Promise(r => setTimeout(r, 300))
-      knightPos.value++
+    for (const [dr, dc] of directions) {
+      const nr = curRow + dr
+      const nc = curCol + dc
+      if (
+        nr >= 0 && nr < map.length &&
+        nc >= 0 && nc < map[0].length &&
+        !visited[nr][nc] &&
+        map[nr][nc] !== -1
+      ) {
+        queue.push([nr, nc])
+        visited[nr][nc] = true
+        prev[nr][nc] = [curRow, curCol]
+      }
     }
   }
+  if(!found) {
+    alert('无法到达终点，请检查路径！')
+    return
+  }
+  // 回溯路径
+  let path = []
+  if (found && target) {
+    let [r, c] = target
+    while (!(r === startRow && c === col)) {
+      path.push([r, c])
+      ;[r, c] = prev[r][c]
+    }
+    path.push([startRow, col])
+    path.reverse()
+  }
 
-  showFeedback.value = true
+  // 显示最优路径（高亮）
+  // 先清除旧的路径标记
+  for (let r = 0; r < map.length; r++) {
+    for (let c = 0; c < map[0].length; c++) {
+      if (map[r][c] === -4) map[r][c] = 0
+    }
+  }
+  // 标记最优路径（不包括起点和终点）
+  for (let i = 1; i < path.length - 1; i++) {
+    const [r, c] = path[i]
+    if (map[r][c] === 0) map[r][c] = -4
+  }
+
+  // 动画移动骑士
+  let curRow = startRow
+  let curCol = col
+  for (let i = 1; i < path.length; i++) {
+    const [nextRow, nextCol] = path[i]
+    curRow = nextRow
+    curCol = nextCol
+    
+    // 更新骑士的完整位置
+    knightRow.value = curRow
+    knightPos.value = curCol
+    
+    await new Promise(r => setTimeout(r, 300))
+  }
+
+  // 检查是否到达终点
+  let endRow = map.findIndex(row => row.includes(2))
+  let endCol = map[endRow].findIndex(cell => cell === 2)
+  showFeedback.value = (curRow === endRow && curCol === endCol)
   setTimeout(() => { showFeedback.value = false }, 2000)
+}
+
+
+function nextLevel() {
+  if (currentLevel.value < levels.length - 1) {
+    currentLevel.value++
+    mapData.value = JSON.parse(JSON.stringify(levels[currentLevel.value].map))
+    resetKnightToStart() // 加这一行
+    showIntro.value = true
+    loadingBlockly.value = true
+    setTimeout(() => {
+      initBlockly()
+    }, 300)
+  }
 }
 </script>
 
