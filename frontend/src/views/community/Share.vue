@@ -454,6 +454,18 @@ const works = ref([
         createTime: '2025-06-30',
         tags: ['游戏', '经典', '方块'],
         isLiked: false 
+    },
+    {
+      id:17,
+      title: '球球大作战',
+      category: '游戏',
+      cover: 'https://img95.699pic.com/element/40169/8698.png_860.png',
+      description: '经典的球球大作战游戏，考验你的智慧！',
+      likes: 12,
+      comments: 8,
+      createTime: '2025-07-17',
+      tags: ['游戏', '经典', '球球大作战'],
+      isLiked: false 
     }
 ])
 

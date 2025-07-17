@@ -647,48 +647,180 @@ function defineCustomBlocks() {
       return `moveSteps(${steps});\n`
     }
   }
-  // while循环
-  if (!Blockly.Blocks['while_not_end']) {
-    Blockly.Blocks['while_not_end'] = {
+  // 向上移动
+  if (!Blockly.Blocks['move_up']) {
+    Blockly.Blocks['move_up'] = {
       init: function () {
-        this.appendStatementInput('DO').appendField('重复执行直到到达终点')
-        this.setColour('#FFAB19')
-        this.setTooltip('while循环，直到骑士到达终点')
+        this.appendDummyInput()
+          .appendField('骑士向上移动')
+          .appendField(new Blockly.FieldNumber(1, 1, 20), 'STEPS')
+          .appendField('步')
+        this.setPreviousStatement(true, null)
+        this.setNextStatement(true, null)
+        this.setColour('#4C97FF')
+        this.setTooltip('骑士向上移动指定步数')
       }
     }
-    Blockly.JavaScript['while_not_end'] = function (block) {
-      var branch = Blockly.JavaScript.statementToCode(block, 'DO')
-      return 'whileNotEnd(async () => {\n' + branch + '});\n'
+    Blockly.JavaScript['move_up'] = function (block) {
+      const steps = block.getFieldValue('STEPS')
+      return `moveUp(${steps});\n`
     }
   }
-  // 判断是否到终点
+  // 向下移动
+  if (!Blockly.Blocks['move_down']) {
+    Blockly.Blocks['move_down'] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField('骑士向下移动')
+          .appendField(new Blockly.FieldNumber(1, 1, 20), 'STEPS')
+          .appendField('步')
+        this.setPreviousStatement(true, null)
+        this.setNextStatement(true, null)
+        this.setColour('#4C97FF')
+        this.setTooltip('骑士向下移动指定步数')
+      }
+    }
+    Blockly.JavaScript['move_down'] = function (block) {
+      const steps = block.getFieldValue('STEPS')
+      return `moveDown(${steps});\n`
+    }
+  }
+  // 向左移动
+  if (!Blockly.Blocks['move_left']) {
+    Blockly.Blocks['move_left'] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField('骑士向左移动')
+          .appendField(new Blockly.FieldNumber(1, 1, 20), 'STEPS')
+          .appendField('步')
+        this.setPreviousStatement(true, null)
+        this.setNextStatement(true, null)
+        this.setColour('#4C97FF')
+        this.setTooltip('骑士向左移动指定步数')
+      }
+    }
+    Blockly.JavaScript['move_left'] = function (block) {
+      const steps = block.getFieldValue('STEPS')
+      return `moveLeft(${steps});\n`
+    }
+  }
+  // 向右移动
+  if (!Blockly.Blocks['move_right']) {
+    Blockly.Blocks['move_right'] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField('骑士向右移动')
+          .appendField(new Blockly.FieldNumber(1, 1, 20), 'STEPS')
+          .appendField('步')
+        this.setPreviousStatement(true, null)
+        this.setNextStatement(true, null)
+        this.setColour('#4C97FF')
+        this.setTooltip('骑士向右移动指定步数')
+      }
+    }
+    Blockly.JavaScript['move_right'] = function (block) {
+      const steps = block.getFieldValue('STEPS')
+      return `moveRight(${steps});\n`
+    }
+  }
+
+  // 判断当前位置是否是障碍
+  if (!Blockly.Blocks['is_obstacle']) {
+    Blockly.Blocks['is_obstacle'] = {
+      init: function () {
+        this.appendDummyInput().appendField('当前位置是否是障碍?')
+        this.setOutput(true, 'Boolean')
+        this.setColour('#FFD700')
+        this.setTooltip('判断当前位置是否是障碍')
+      }
+    }
+    Blockly.JavaScript['is_obstacle'] = function () {
+      return ['isObstacle()', Blockly.JavaScript.ORDER_NONE]
+    }
+  }
+
+  // 判断是否到达终点
   if (!Blockly.Blocks['is_at_end']) {
     Blockly.Blocks['is_at_end'] = {
       init: function () {
-        this.appendDummyInput().appendField('是否到达终点?')
+        this.appendDummyInput().appendField('当前位置是否为终点?')
         this.setOutput(true, 'Boolean')
         this.setColour('#FFD700')
-        this.setTooltip('判断骑士是否到达终点')
+        this.setTooltip('判断当前位置是否为终点')
       }
     }
     Blockly.JavaScript['is_at_end'] = function () {
       return ['isAtEnd()', Blockly.JavaScript.ORDER_NONE]
     }
   }
-  // 输出提示
+
+  // 显示提示
   if (!Blockly.Blocks['show_tip']) {
     Blockly.Blocks['show_tip'] = {
       init: function () {
-        this.appendDummyInput().appendField('输出提示').appendField(new Blockly.FieldTextInput('继续加油！'), 'TIP')
+        this.appendDummyInput().appendField('提示').appendField(new Blockly.FieldTextInput('继续加油！'), 'TIP')
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
         this.setColour('#8BC34A')
-        this.setTooltip('在页面上输出提示')
+        this.setTooltip('显示提示信息')
       }
     }
     Blockly.JavaScript['show_tip'] = function (block) {
       const tip = block.getFieldValue('TIP')
-      return `showTip('${tip}');\n`
+      return `showTip("${tip}");\n`
+    }
+  }
+
+  // for循环
+  if (!Blockly.Blocks['for_loop']) {
+    Blockly.Blocks['for_loop'] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField('重复')
+          .appendField(new Blockly.FieldNumber(3, 1, 100), 'TIMES')
+          .appendField('次')
+        this.appendStatementInput('DO').appendField('执行')
+        this.setColour('#FFAB19')
+        this.setTooltip('for循环，重复指定次数')
+      }
+    }
+    Blockly.JavaScript['for_loop'] = function (block) {
+      const times = block.getFieldValue('TIMES')
+      const branch = Blockly.JavaScript.statementToCode(block, 'DO')
+      return `for(let i=0;i<${times};i++){${branch}}\n`
+    }
+  }
+
+  // do-while循环
+  if (!Blockly.Blocks['do_while']) {
+    Blockly.Blocks['do_while'] = {
+      init: function () {
+        this.appendStatementInput('DO').appendField('先执行')
+        this.appendValueInput('COND').setCheck('Boolean').appendField('直到')
+        this.setColour('#FFAB19')
+        this.setTooltip('do-while循环，先执行再判断条件')
+      }
+    }
+    Blockly.JavaScript['do_while'] = function (block) {
+      const branch = Blockly.JavaScript.statementToCode(block, 'DO')
+      const cond = Blockly.JavaScript.valueToCode(block, 'COND', Blockly.JavaScript.ORDER_NONE) || 'false'
+      return `do{${branch}}while(!(${cond}));\n`
+    }
+  }
+  // while_not_end 循环
+  if (!Blockly.Blocks['while_not_end']) {
+    Blockly.Blocks['while_not_end'] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField('当未到终点时重复')
+        this.appendStatementInput('DO').appendField('执行')
+        this.setColour('#FFAB19')
+        this.setTooltip('while循环，直到到达终点')
+      }
+    }
+    Blockly.JavaScript['while_not_end'] = function (block) {
+      const branch = Blockly.JavaScript.statementToCode(block, 'DO')
+      return `while(!isAtEnd()){\n${branch}}\n`
     }
   }
 }
@@ -734,13 +866,20 @@ function initBlockly() {
           <xml>
             <category name="循环" colour="#FFAB19">
               <block type="while_not_end"></block>
+              <block type="for_loop"></block>
+              <block type="do_while"></block>
             </category>
             <category name="动作" colour="#4C97FF">
               <block type="move_step"></block>
               <block type="move_steps"></block>
+              <block type="move_up"></block>
+              <block type="move_down"></block>
+              <block type="move_left"></block>
+              <block type="move_right"></block>
             </category>
             <category name="判断" colour="#FFD700">
               <block type="is_at_end"></block>
+              <block type="is_obstacle"></block>
             </category>
             <category name="提示" colour="#8BC34A">
               <block type="show_tip"></block>
@@ -779,6 +918,34 @@ window.moveStep = function () {
 window.moveSteps = function (steps) {
   for (let i = 0; i < steps; i++) {
     if (knightPos.value < mapData.value[0].length - 1) {
+      knightPos.value++
+    }
+  }
+}
+window.moveUp = function (steps) {
+  for (let i = 0; i < steps; i++) {
+    if (knightRow.value > 0 && mapData.value[knightRow.value - 1][knightPos.value] !== -1) {
+      knightRow.value--
+    }
+  }
+}
+window.moveDown = function (steps) {
+  for (let i = 0; i < steps; i++) {
+    if (knightRow.value < mapData.value.length - 1 && mapData.value[knightRow.value + 1][knightPos.value] !== -1) {
+      knightRow.value++
+    }
+  }
+}
+window.moveLeft = function (steps) {
+  for (let i = 0; i < steps; i++) {
+    if (knightPos.value > 0 && mapData.value[knightRow.value][knightPos.value - 1] !== -1) {
+      knightPos.value--
+    }
+  }
+}
+window.moveRight = function (steps) {
+  for (let i = 0; i < steps; i++) {
+    if (knightPos.value < mapData.value[0].length - 1 && mapData.value[knightRow.value][knightPos.value + 1] !== -1) {
       knightPos.value++
     }
   }
